@@ -4,13 +4,13 @@ import {
   convertTableToJson,
   writeJsonToFile,
   camelize,
-} from './utility.js'
-import { homeVillage } from './buildings.js'
+} from './utility'
+import { homeVillage } from './buildings'
 
 const WIKI_BASE_URL = 'https://clashofclans.fandom.com/wiki/'
 
-const run = async () => {
-  const buildings = {}
+const run = async (): Promise<void> => {
+  const buildings: any = {}
   for (const building of homeVillage.buildings.resource) {
     console.log(building)
     const $ = await getPage(WIKI_BASE_URL + building.replaceAll(' ', '_'))

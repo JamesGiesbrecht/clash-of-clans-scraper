@@ -36,12 +36,9 @@ module.exports = {
     'prettier/prettier': [
       'warn',
       {
-        semi: false,
-        trailingComma: 'all',
         singleQuote: true,
-        printWidth: 100,
-        parser: 'typescript',
-        tabWidth: 2,
+        trailingComma: 'all',
+        semi: false,
         endOfLine: 'auto',
       },
     ],
