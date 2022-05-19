@@ -1,8 +1,8 @@
 import {
   getPage,
-  convertToLowercaseRemoveSpaces,
   convertTableToJson,
   writeJsonToFile,
+  convertToLowercaseRemoveSpaces,
   camelize,
 } from './utility'
 import { homeVillage } from './buildings'
@@ -18,7 +18,6 @@ const run = async (): Promise<void> => {
     const tableAsJson = convertTableToJson($, tableId)
     buildings[camelize(building)] = tableAsJson
   }
-  console.log('writing', buildings)
   writeJsonToFile(`buildings.json`, buildings)
 }
 

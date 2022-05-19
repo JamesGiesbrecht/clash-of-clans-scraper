@@ -1,23 +1,9 @@
 import axios from 'axios'
 import cheerio from 'cheerio'
-import fs from 'fs'
-import path from 'path'
 
 export const getPage = async (url: string) => {
   const result = await axios.get(url)
   return cheerio.load(result.data)
-}
-
-export const convertToLowercaseRemoveSpaces = (str: string): string => {
-  return str.replaceAll(' ', '').toLowerCase()
-}
-
-export const camelize = (str: string): string => {
-  return str
-    .replace(/(?:^\w|[A-Z]|\b\w)/g, (word, index) => {
-      return index === 0 ? word.toLowerCase() : word.toUpperCase()
-    })
-    .replace(/\s+/g, '')
 }
 
 export const convertTableToJson = ($: cheerio.Root, tableId: string): any => {
@@ -58,18 +44,4 @@ export const convertTableToJson = ($: cheerio.Root, tableId: string): any => {
     })
 
   return tableAsJson
-}
-
-export const writeJsonToFile = (fileName: string, json: any): void => {
-  fs.writeFile(
-    path.join('json', fileName),
-    JSON.stringify(json, null, 2),
-    (err) => {
-      if (err) {
-        console.log(err)
-      } else {
-        console.log(`JSON saved to ${fileName}`)
-      }
-    },
-  )
 }
