@@ -10,7 +10,6 @@ export const getStatsTable = ($: cheerio.Root): cheerio.Cheerio => {
   return $('table')
     .filter((i, el) => {
       const headerText = $(el).find('th').first().text().trim()
-      console.log(i, headerText, headerText === 'Level')
       return headerText === 'Level'
 
       // $('th', el).filter((i, el) => $(el).text().trim() === 'Level').length > 0
@@ -22,19 +21,36 @@ export const getStatsTable = ($: cheerio.Root): cheerio.Cheerio => {
 export const convertTableToJson = (
   $: cheerio.Root,
   table: cheerio.Cheerio,
+  buildingName?: string,
 ): any => {
   const tableAsJson: any[] = []
   // Get column headings
   // @fixme Doesn't support vertical column headings.
   // @todo Try to support badly formated tables.
   const columnHeadings: any[] = []
+
+  const indexesToSkip: {
+    [key: string]: { headers: number[]; rows: number[] }
+  } = {
+    'Inferno Tower': {
+      headers: [1, 2],
+      rows: [1, 2, 3, 4, 5, 6],
+    },
+  }
+
   $(table)
     .find('tr')
+    .first()
     .each((i, row) => {
       $(row)
         .find('th')
         .each((j, cell) => {
-          columnHeadings[j] = $(cell).text().trim()
+          if (buildingName && indexesToSkip[buildingName]) {
+            if (indexesToSkip[buildingName].headers.includes(j)) {
+              return
+            }
+          }
+          columnHeadings.push($(cell).text().trim())
         })
     })
 
@@ -43,14 +59,19 @@ export const convertTableToJson = (
     .find('tr')
     .each((i, row) => {
       const rowAsJson: any = {}
+      const rowValues: any[] = []
       $(row)
         .find('td')
         .each((j, cell) => {
-          if (columnHeadings[j]) {
-            rowAsJson[columnHeadings[j]] = $(cell).text().trim()
-          } else {
-            rowAsJson[j] = $(cell).text().trim()
+          if (buildingName && indexesToSkip[buildingName]) {
+            if (indexesToSkip[buildingName].rows.includes(j)) {
+              return
+            }
           }
+          rowValues.push($(cell).text().trim())
+          columnHeadings.forEach((heading, index) => {
+            rowAsJson[heading] = rowValues[index]
+          })
         })
 
       // Skip blank rows
