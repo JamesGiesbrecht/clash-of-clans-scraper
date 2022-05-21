@@ -13,21 +13,35 @@ export const camelize = (str: string): string => {
 export const ucFirst = (str: string): string =>
   str.charAt(0).toUpperCase() + str.slice(1)
 
-// convert '1d 2h 3m 18s' to seconds
 export const convertTimeStringToSeconds = (timeString: string): number => {
-  if (timeString === 'N/A' || timeString === '') return 0
+  if (timeString === 'N/A' || timeString === '' || timeString === 'None')
+    return 0
   if (!timeString)
     throw new Error('Error converting time string, time string is undefined')
-  const [d, h, m, s] = timeString.split(' ')
-  return (
-    parseInt(d, 10) * 86400 +
-    parseInt(h, 10) * 3600 +
-    parseInt(m, 10) * 60 +
-    parseInt(s, 10)
-  )
+  const timeParts = timeString.split(' ')
+
+  const seconds: number = timeParts.reduce((acc: number, timePart: string) => {
+    const currentAcc = acc
+    switch (timePart.slice(-1)) {
+      case 's':
+        return currentAcc + parseInt(timePart, 10)
+      case 'm':
+        return currentAcc + parseInt(timePart, 10) * 60
+      case 'h':
+        return currentAcc + parseInt(timePart, 10) * 60 * 60
+      case 'd':
+        return currentAcc + parseInt(timePart, 10) * 60 * 60 * 24
+      default:
+        throw new Error(
+          `Error converting time string, unknown time part ${timePart}`,
+        )
+    }
+  }, 0)
+
+  return seconds
 }
 
 export const parseNumber = (str: string): number => {
   if (!str) throw new Error('Error parsing number, string is empty')
-  return parseInt(str.replaceAll(' ', '').replaceAll(',', ''), 10)
+  return parseInt(str.replaceAll(' ', '').replaceAll(',', ''), 10) || 0
 }

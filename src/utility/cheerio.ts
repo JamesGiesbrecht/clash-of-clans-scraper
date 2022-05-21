@@ -11,9 +11,6 @@ export const getStatsTable = ($: cheerio.Root): cheerio.Cheerio => {
     .filter((i, el) => {
       const headerText = $(el).find('th').first().text().trim()
       return headerText === 'Level'
-
-      // $('th', el).filter((i, el) => $(el).text().trim() === 'Level').length > 0
-      // $(el).text().trim() === 'Build Cost'
     })
     .first()
 }

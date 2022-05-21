@@ -48,6 +48,7 @@ const run = async (): Promise<void> => {
         .last()
         .attr('title') as Resource
       const buildingType: BuildingType = ucFirst(category) as BuildingType
+      console.log('Formatting building', buildingName)
       const building: Building = {
         name: buildingName,
         resource,
