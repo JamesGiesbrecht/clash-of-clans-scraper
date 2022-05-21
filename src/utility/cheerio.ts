@@ -6,9 +6,23 @@ export const getPage = async (url: string) => {
   return cheerio.load(result.data)
 }
 
-export const convertTableToJson = ($: cheerio.Root, tableId: string): any => {
-  const table = $(`#${tableId}`)
-  console.log(tableId)
+export const getStatsTable = ($: cheerio.Root): cheerio.Cheerio => {
+  return $('table')
+    .filter((i, el) => {
+      const headerText = $(el).find('th').first().text().trim()
+      console.log(i, headerText, headerText === 'Level')
+      return headerText === 'Level'
+
+      // $('th', el).filter((i, el) => $(el).text().trim() === 'Level').length > 0
+      // $(el).text().trim() === 'Build Cost'
+    })
+    .first()
+}
+
+export const convertTableToJson = (
+  $: cheerio.Root,
+  table: cheerio.Cheerio,
+): any => {
   const tableAsJson: any[] = []
   // Get column headings
   // @fixme Doesn't support vertical column headings.

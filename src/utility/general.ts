@@ -7,7 +7,7 @@ export const writeJsonToFile = (fileName: string, json: any): void => {
     JSON.stringify(json, null, 2),
     (err) => {
       if (err) {
-        console.log(err)
+        console.error(err)
       } else {
         console.log(`JSON saved to ${fileName}`)
       }
