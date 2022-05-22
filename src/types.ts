@@ -2,6 +2,10 @@ export type Resource = 'Gold' | 'Elixir' | 'Dark Elixir'
 
 export type BuildingType = 'Defense' | 'Army' | 'Resource'
 
+export type Availability = {
+  [key: number]: number
+}
+
 export type Level = {
   level: number
   buildCost: number
@@ -15,6 +19,7 @@ export type Building = {
   resource: Resource
   type: BuildingType
   levels: Level[]
+  availability: Availability
 }
 
 export type IndexesToSkip = {

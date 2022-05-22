@@ -6,6 +6,8 @@ import {
   ucFirst,
   getStatsTable,
   parseNumber,
+  getAvailabilityTable,
+  convertAvailabilityTableToJson,
 } from './utility'
 import { defaultScrapingHeaders, homeVillage } from './buildings'
 import {
@@ -52,30 +54,37 @@ const run = async (): Promise<void> => {
     // Convert each table to json
     buildingsList.forEach((buildingInfo, index) => {
       const $ = pages[index]
-      const table = getStatsTable($)
-      const tableAsJson = convertTableToJson(
+      const statsTable = getStatsTable($)
+      const availibityTable = getAvailabilityTable($)
+      const statsTableAsJson = convertTableToJson(
         $,
-        table,
+        statsTable,
         buildingInfo.indexesToSkip,
       )
+      const availabilityTableAsJson = convertAvailabilityTableToJson(
+        $,
+        availibityTable,
+      )
+      console.log(availabilityTableAsJson)
       const scrapingHeaders = {
         ...defaultScrapingHeaders,
         ...buildingInfo.scraping,
       }
-      const resource: Resource = $('th', table)
+      const resource: Resource = $('th', statsTable)
         .filter((i, el) => $(el).text().trim() === scrapingHeaders.buildCost)
         .children('a')
         .last()
         .attr('title') as Resource
       const buildingType: BuildingType = ucFirst(category) as BuildingType
-      console.log('Formatting building', buildingInfo.name)
+
       const building: Building = {
         name: buildingInfo.name,
         resource,
         type: buildingType,
-        levels: tableAsJson.map((rawLevel: any) =>
+        levels: statsTableAsJson.map((rawLevel: any) =>
           formatLevel(rawLevel, scrapingHeaders),
         ),
+        availability: availabilityTableAsJson,
       }
 
       buildings.push(building)
