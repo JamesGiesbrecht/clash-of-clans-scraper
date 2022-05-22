@@ -7,7 +7,7 @@ export type Level = {
   buildCost: number
   buildTime: number
   friendlyBuildTime: string
-  requiredHall: number
+  requiredHall?: number
 }
 
 export type Building = {
@@ -15,4 +15,22 @@ export type Building = {
   resource: Resource
   type: BuildingType
   levels: Level[]
+}
+
+export type IndexesToSkip = {
+  headers?: number[]
+  rows?: number[]
+}
+
+export type ScrapingHeaders = {
+  level?: string
+  buildCost?: string
+  buildTime?: string
+  requiredHall?: string
+}
+
+export type ScrapingTemplate = {
+  name: string
+  indexesToSkip?: IndexesToSkip
+  scraping?: ScrapingHeaders
 }

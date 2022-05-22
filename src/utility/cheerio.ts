@@ -1,5 +1,6 @@
 import axios from 'axios'
 import cheerio from 'cheerio'
+import { IndexesToSkip } from '../types'
 
 export const getPage = async (url: string) => {
   const result = await axios.get(url)
@@ -10,7 +11,7 @@ export const getStatsTable = ($: cheerio.Root): cheerio.Cheerio => {
   return $('table')
     .filter((i, el) => {
       const headerText = $(el).find('th').first().text().trim()
-      return headerText === 'Level'
+      return headerText === 'Level' || headerText === 'TH Level'
     })
     .first()
 }
@@ -18,22 +19,13 @@ export const getStatsTable = ($: cheerio.Root): cheerio.Cheerio => {
 export const convertTableToJson = (
   $: cheerio.Root,
   table: cheerio.Cheerio,
-  buildingName?: string,
+  indexesToSkip?: IndexesToSkip,
 ): any => {
   const tableAsJson: any[] = []
   // Get column headings
   // @fixme Doesn't support vertical column headings.
   // @todo Try to support badly formated tables.
   const columnHeadings: any[] = []
-
-  const indexesToSkip: {
-    [key: string]: { headers: number[]; rows: number[] }
-  } = {
-    'Inferno Tower': {
-      headers: [1, 2],
-      rows: [1, 2, 3, 4, 5, 6],
-    },
-  }
 
   $(table)
     .find('tr')
@@ -42,8 +34,8 @@ export const convertTableToJson = (
       $(row)
         .find('th')
         .each((j, cell) => {
-          if (buildingName && indexesToSkip[buildingName]) {
-            if (indexesToSkip[buildingName].headers.includes(j)) {
+          if (indexesToSkip) {
+            if (indexesToSkip.headers?.includes(j)) {
               return
             }
           }
@@ -60,8 +52,8 @@ export const convertTableToJson = (
       $(row)
         .find('td')
         .each((j, cell) => {
-          if (buildingName && indexesToSkip[buildingName]) {
-            if (indexesToSkip[buildingName].rows.includes(j)) {
+          if (indexesToSkip) {
+            if (indexesToSkip.rows?.includes(j)) {
               return
             }
           }

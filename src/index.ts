@@ -7,22 +7,34 @@ import {
   getStatsTable,
   parseNumber,
 } from './utility'
-import { homeVillage } from './buildings'
-import { Building, BuildingType, Level, Resource } from './types'
+import { defaultScrapingHeaders, homeVillage } from './buildings'
+import {
+  Building,
+  BuildingType,
+  Level,
+  Resource,
+  ScrapingHeaders,
+} from './types'
 
 const WIKI_BASE_URL = 'https://clashofclans.fandom.com/wiki/'
 
-const formatLevel = (rawLevel: { [key: string]: string }): Level => {
-  return {
-    level: parseNumber(rawLevel.Level),
-    buildCost: parseNumber(rawLevel['Build Cost'] || rawLevel.Cost),
-    buildTime: convertTimeStringToSeconds(rawLevel['Build Time']),
-    friendlyBuildTime: rawLevel['Build Time'],
-    requiredHall: parseNumber(
-      rawLevel['Town Hall Level Required'] ||
-        rawLevel['Town HallLevel Required'],
+const formatLevel = (
+  rawLevel: { [key: string]: string },
+  scrapingHeaders: ScrapingHeaders,
+): Level => {
+  const level: Level = {
+    level: parseNumber(rawLevel[scrapingHeaders.level]),
+    buildCost: parseNumber(
+      rawLevel[scrapingHeaders.buildCost] || rawLevel.Cost,
     ),
+    buildTime: convertTimeStringToSeconds(rawLevel[scrapingHeaders.buildTime]),
+    friendlyBuildTime: rawLevel[scrapingHeaders.buildTime],
   }
+
+  if (scrapingHeaders.requiredHall) {
+    level.requiredHall = parseNumber(rawLevel[scrapingHeaders.requiredHall])
+  }
+  return level
 }
 
 const run = async (): Promise<void> => {
@@ -32,28 +44,38 @@ const run = async (): Promise<void> => {
   )) {
     // Get html for all buildings in category
     const pages = await Promise.all(
-      buildingsList.map(async (buildingName) => {
-        console.log('Fetching', buildingName)
-        return getPage(WIKI_BASE_URL + buildingName.replaceAll(' ', '_'))
+      buildingsList.map(async (buildingInfo) => {
+        console.log('Fetching', buildingInfo.name)
+        return getPage(WIKI_BASE_URL + buildingInfo.name.replaceAll(' ', '_'))
       }),
     )
     // Convert each table to json
-    buildingsList.forEach((buildingName, index) => {
+    buildingsList.forEach((buildingInfo, index) => {
       const $ = pages[index]
       const table = getStatsTable($)
-      const tableAsJson = convertTableToJson($, table, buildingName)
+      const tableAsJson = convertTableToJson(
+        $,
+        table,
+        buildingInfo.indexesToSkip,
+      )
+      const scrapingHeaders = {
+        ...defaultScrapingHeaders,
+        ...buildingInfo.scraping,
+      }
       const resource: Resource = $('th', table)
-        .filter((i, el) => $(el).text().trim() === 'Build Cost')
+        .filter((i, el) => $(el).text().trim() === scrapingHeaders.buildCost)
         .children('a')
         .last()
         .attr('title') as Resource
       const buildingType: BuildingType = ucFirst(category) as BuildingType
-      console.log('Formatting building', buildingName)
+      console.log('Formatting building', buildingInfo.name)
       const building: Building = {
-        name: buildingName,
+        name: buildingInfo.name,
         resource,
         type: buildingType,
-        levels: tableAsJson.map((rawLevel: any) => formatLevel(rawLevel)),
+        levels: tableAsJson.map((rawLevel: any) =>
+          formatLevel(rawLevel, scrapingHeaders),
+        ),
       }
 
       buildings.push(building)

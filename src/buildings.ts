@@ -1,45 +1,76 @@
-export const homeVillage = {
+import { ScrapingTemplate } from './types'
+
+export const defaultScrapingHeaders = {
+  level: 'Level',
+  buildCost: 'Build Cost',
+  buildTime: 'Build Time',
+  requiredHall: 'Town Hall Level Required',
+}
+
+export const homeVillage: {
+  buildings: {
+    defense: ScrapingTemplate[]
+    army: ScrapingTemplate[]
+    resource: ScrapingTemplate[]
+  }
+} = {
   buildings: {
     defense: [
-      'Cannon',
-      'Archer Tower',
-      'Mortar',
-      'Air Defense',
-      'Wizard Tower',
-      'Air Sweeper',
-      'Hidden Tesla',
-      'Bomb Tower',
-      'X-Bow',
-      'Inferno Tower',
-      'Eagle Artillery',
-      'Scattershot',
-      "Builder's Hut",
-      'Bomb',
-      'Spring Trap',
-      'Air Bomb',
-      'Giant Bomb',
-      'Seeking Air Mine',
-      'Skeleton Trap',
-      'Tornado Trap',
+      { name: 'Cannon' },
+      { name: 'Archer Tower' },
+      { name: 'Mortar' },
+      { name: 'Air Defense' },
+      { name: 'Wizard Tower' },
+      { name: 'Air Sweeper' },
+      { name: 'Hidden Tesla' },
+      { name: 'Bomb Tower' },
+      { name: 'X-Bow' },
+      {
+        name: 'Inferno Tower',
+        indexesToSkip: {
+          headers: [1, 2],
+          rows: [1, 2, 3, 4, 5, 6],
+        },
+      },
+      { name: 'Eagle Artillery' },
+      { name: 'Scattershot' },
+      { name: "Builder's Hut" },
+      { name: 'Bomb' },
+      { name: 'Spring Trap' },
+      { name: 'Air Bomb' },
+      { name: 'Giant Bomb' },
+      { name: 'Seeking Air Mine' },
+      { name: 'Skeleton Trap' },
+      { name: 'Tornado Trap' },
     ],
     army: [
-      'Army Camp',
-      'Barracks',
-      'Dark Barracks',
-      'Laboratory',
-      'Spell Factory',
-      'Dark Spell Factory',
-      'Workshop',
-      'Pet House',
+      { name: 'Army Camp' },
+      { name: 'Barracks' },
+      { name: 'Dark Barracks' },
+      { name: 'Laboratory' },
+      {
+        name: 'Spell Factory',
+        scraping: { requiredHall: 'Town HallLevel Required' },
+      },
+      {
+        name: 'Dark Spell Factory',
+        scraping: { requiredHall: 'Town HallLevel Required' },
+      },
+      { name: 'Workshop' },
+      { name: 'Pet House' },
     ],
     resource: [
-      'Gold Mine',
-      'Elixir Collector',
-      'Dark Elixir Drill',
-      'Gold Storage',
-      'Elixir Storage',
-      'Dark Elixir Storage',
-      'Clan Castle',
+      { name: 'Gold Mine' },
+      { name: 'Elixir Collector' },
+      { name: 'Dark Elixir Drill' },
+      { name: 'Gold Storage' },
+      { name: 'Elixir Storage' },
+      { name: 'Dark Elixir Storage' },
+      { name: 'Clan Castle' },
+      {
+        name: 'Town Hall',
+        scraping: { level: 'TH Level', requiredHall: null },
+      },
     ],
   },
 }
