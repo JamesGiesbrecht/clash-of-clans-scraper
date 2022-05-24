@@ -1,6 +1,10 @@
+type Overwrite<T, U> = Pick<T, Exclude<keyof T, keyof U>> & U
+
 export type Resource = 'Gold' | 'Elixir' | 'Dark Elixir'
 
 export type BuildingType = 'Defense' | 'Army' | 'Resource'
+
+export type VillageType = 'home-village' | 'builder-base'
 
 export type Availability = {
   [key: number]: number
@@ -21,6 +25,13 @@ export type Building = {
   levels: Level[]
   availability: Availability
 }
+
+export type SpecialtyBuilding = Overwrite<
+  Building,
+  {
+    levels: Array<Level | { level: number; requirement: any }>
+  }
+>
 
 export type IndexesToSkip = {
   headers?: number[]
@@ -47,4 +58,5 @@ export type VillageBuildingScrapingCollection = {
     army: ScrapingTemplate[]
     resource: ScrapingTemplate[]
   }
+  specialtyBuildings?: SpecialtyBuilding[]
 }

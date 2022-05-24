@@ -136,12 +136,83 @@ export const builderBase: VillageBuildingScrapingCollection = {
       { name: 'Clock Tower' },
     ],
   },
+  specialtyBuildings: [
+    {
+      name: 'O.T.T.O. Hut',
+      resource: 'Gold',
+      type: 'Resource',
+      levels: [
+        {
+          level: 1,
+          buildCost: 100000,
+          buildTime: 0,
+          friendlyBuildTime: 'N/A',
+          requiredHall: 9,
+        },
+        {
+          level: 2,
+          requirement: {
+            homeVillage: {
+              cannon: {
+                gearedUp: true,
+              },
+              archerTower: {
+                gearedUp: true,
+              },
+              mortar: {
+                gearedUp: true,
+              },
+            },
+          },
+        },
+        {
+          level: 3,
+          requirement: {
+            builderBase: {
+              cannonCart: {
+                level: 18,
+              },
+            },
+          },
+        },
+        {
+          level: 4,
+          requirement: {
+            builderBase: {
+              megaTesla: {
+                level: 9,
+              },
+            },
+          },
+        },
+        {
+          level: 5,
+          requirement: {
+            builderBase: {
+              battleMachine: {
+                level: 30,
+              },
+            },
+          },
+        },
+      ],
+      availability: {
+        '1': 0,
+        '2': 0,
+        '3': 0,
+        '4': 0,
+        '5': 0,
+        '6': 0,
+        '7': 0,
+        '8': 0,
+        '9': 1,
+      },
+    },
+  ],
 }
 
 // Home Village
-
 // Heroes
 
 // Builder Base
-// Walls
 // Battle Machine
