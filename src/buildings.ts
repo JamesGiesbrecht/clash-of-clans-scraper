@@ -1,19 +1,20 @@
-import { ScrapingTemplate } from './types'
+import { VillageBuildingScrapingCollection } from './types'
 
-export const defaultScrapingHeaders = {
+export const defaultHomeScrapingHeaders = {
   level: 'Level',
   buildCost: 'Build Cost',
   buildTime: 'Build Time',
   requiredHall: 'Town Hall Level Required',
 }
 
-export const homeVillage: {
-  buildings: {
-    defense: ScrapingTemplate[]
-    army: ScrapingTemplate[]
-    resource: ScrapingTemplate[]
-  }
-} = {
+export const defaultBuilderScrapingHeaders = {
+  ...defaultHomeScrapingHeaders,
+  requiredHall: 'Builder Hall Level Required',
+}
+
+const BUILDER_BASE_SUFFIX = '/Builder_Base'
+
+export const homeVillage: VillageBuildingScrapingCollection = {
   buildings: {
     defense: [
       { name: 'Cannon' },
@@ -74,3 +75,59 @@ export const homeVillage: {
     ],
   },
 }
+
+export const builderBase: VillageBuildingScrapingCollection = {
+  buildings: {
+    defense: [
+      { name: 'Cannon', urlSuffix: BUILDER_BASE_SUFFIX },
+      { name: 'Double Cannon' },
+      { name: 'Archer Tower', urlSuffix: BUILDER_BASE_SUFFIX },
+      { name: 'Hidden Tesla', urlSuffix: BUILDER_BASE_SUFFIX },
+      { name: 'Firecrackers' },
+      { name: 'Crusher', urlSuffix: BUILDER_BASE_SUFFIX },
+      {
+        name: 'Guard Post',
+        indexesToSkip: {
+          headers: [1],
+          rows: [1, 2],
+        },
+      },
+      { name: 'Air Bombs', urlSuffix: BUILDER_BASE_SUFFIX },
+      { name: 'Multi Mortar', urlSuffix: BUILDER_BASE_SUFFIX },
+      { name: 'Roaster' },
+      { name: 'Giant Cannon', urlSuffix: BUILDER_BASE_SUFFIX },
+      { name: 'Mega Tesla' },
+      { name: 'Lava Launcher' },
+      { name: 'Push Trap' },
+      { name: 'Spring Trap', urlSuffix: BUILDER_BASE_SUFFIX },
+      { name: 'Mine', urlSuffix: BUILDER_BASE_SUFFIX },
+      { name: 'Mega Mine', urlSuffix: BUILDER_BASE_SUFFIX },
+    ],
+    army: [
+      { name: 'Builder Barracks' },
+      { name: 'Army Camp', urlSuffix: BUILDER_BASE_SUFFIX },
+      { name: 'Star Laboratory' },
+    ],
+    resource: [
+      {
+        name: 'Builder Hall',
+        scraping: { level: 'BH Level', requiredHall: null },
+      },
+      { name: 'Gold Mine', urlSuffix: BUILDER_BASE_SUFFIX },
+      { name: 'Elixir Collector', urlSuffix: BUILDER_BASE_SUFFIX },
+      { name: 'Gold Storage', urlSuffix: BUILDER_BASE_SUFFIX },
+      { name: 'Elixir Storage', urlSuffix: BUILDER_BASE_SUFFIX },
+      { name: 'Gem Mine' },
+      { name: 'Clock Tower' },
+    ],
+  },
+}
+
+// Home Village
+// Walls
+// Heroes
+
+// Builder Base
+// Walls
+// Battle Machine
+// O.T.T.O Hut

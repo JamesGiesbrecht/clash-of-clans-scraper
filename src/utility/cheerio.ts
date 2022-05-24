@@ -12,7 +12,11 @@ export const getStatsTable = ($: cheerio.Root): cheerio.Cheerio => {
   return $('table')
     .filter((i, el) => {
       const headerText = $(el).find('th').first().text().trim()
-      return headerText === 'Level' || headerText === 'TH Level'
+      return (
+        headerText === 'Level' ||
+        headerText === 'TH Level' ||
+        headerText === 'BH Level'
+      )
     })
     .first()
 }
@@ -23,7 +27,8 @@ export const getAvailabilityTable = ($: cheerio.Root): cheerio.Cheerio => {
       const firstHeaderText = $(el).find('th').first().text().trim()
       const lastHeaderText = $(el).find('th').last().text().trim()
       return (
-        firstHeaderText === 'Town Hall Level' &&
+        (firstHeaderText === 'Town Hall Level' ||
+          firstHeaderText === 'Builder Hall Level') &&
         lastHeaderText === 'Number Available'
       )
     })

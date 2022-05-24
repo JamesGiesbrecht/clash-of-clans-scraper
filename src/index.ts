@@ -9,7 +9,12 @@ import {
   getAvailabilityTable,
   convertAvailabilityTableToJson,
 } from './utility'
-import { defaultScrapingHeaders, homeVillage } from './buildings'
+import {
+  builderBase,
+  defaultBuilderScrapingHeaders,
+  defaultHomeScrapingHeaders,
+  homeVillage,
+} from './buildings'
 import {
   Building,
   BuildingType,
@@ -39,16 +44,29 @@ const formatLevel = (
   return level
 }
 
-const run = async (): Promise<void> => {
+const fetchBuildings = async (
+  village: 'home-village' | 'builder-base',
+): Promise<void> => {
+  const buildingsCollection =
+    village === 'home-village' ? homeVillage : builderBase
+  const fileName = `${village}-buildings`
+  const defaultScrapingHeaders =
+    village === 'home-village'
+      ? defaultHomeScrapingHeaders
+      : defaultBuilderScrapingHeaders
   const buildings: Building[] = []
   for (const [category, buildingsList] of Object.entries(
-    homeVillage.buildings,
+    buildingsCollection.buildings,
   )) {
     // Get html for all buildings in category
     const pages = await Promise.all(
       buildingsList.map(async (buildingInfo) => {
         console.log('Fetching', buildingInfo.name)
-        return getPage(WIKI_BASE_URL + buildingInfo.name.replaceAll(' ', '_'))
+        return getPage(
+          WIKI_BASE_URL +
+            buildingInfo.name.replaceAll(' ', '_') +
+            (buildingInfo.urlSuffix || ''),
+        )
       }),
     )
     // Convert each table to json
@@ -65,7 +83,6 @@ const run = async (): Promise<void> => {
         $,
         availibityTable,
       )
-      console.log(availabilityTableAsJson)
       const scrapingHeaders = {
         ...defaultScrapingHeaders,
         ...buildingInfo.scraping,
@@ -76,7 +93,6 @@ const run = async (): Promise<void> => {
         .last()
         .attr('title') as Resource
       const buildingType: BuildingType = ucFirst(category) as BuildingType
-
       const building: Building = {
         name: buildingInfo.name,
         resource,
@@ -90,7 +106,12 @@ const run = async (): Promise<void> => {
       buildings.push(building)
     })
   }
-  writeJsonToFile(`buildings.json`, buildings)
+  writeJsonToFile(`${fileName}.json`, buildings)
+}
+
+const run = async (): Promise<void> => {
+  await fetchBuildings('home-village')
+  await fetchBuildings('builder-base')
 }
 
 run()

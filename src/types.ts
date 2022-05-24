@@ -36,6 +36,15 @@ export type ScrapingHeaders = {
 
 export type ScrapingTemplate = {
   name: string
+  urlSuffix?: string
   indexesToSkip?: IndexesToSkip
   scraping?: ScrapingHeaders
+}
+
+export type VillageBuildingScrapingCollection = {
+  buildings: {
+    defense: ScrapingTemplate[]
+    army: ScrapingTemplate[]
+    resource: ScrapingTemplate[]
+  }
 }
