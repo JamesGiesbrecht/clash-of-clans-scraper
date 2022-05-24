@@ -14,7 +14,7 @@ import {
   defaultBuilderScrapingHeaders,
   defaultHomeScrapingHeaders,
   homeVillage,
-} from './buildings'
+} from './data/buildings'
 import {
   Building,
   BuildingType,
@@ -29,13 +29,16 @@ const formatLevel = (
   rawLevel: { [key: string]: string },
   scrapingHeaders: ScrapingHeaders,
 ): Level => {
+  const { seconds, timeString } = convertTimeStringToSeconds(
+    rawLevel[scrapingHeaders.buildTime],
+  )
   const level: Level = {
     level: parseNumber(rawLevel[scrapingHeaders.level]),
     buildCost: parseNumber(
       rawLevel[scrapingHeaders.buildCost] || rawLevel.Cost,
     ),
-    buildTime: convertTimeStringToSeconds(rawLevel[scrapingHeaders.buildTime]),
-    friendlyBuildTime: rawLevel[scrapingHeaders.buildTime],
+    buildTime: seconds,
+    friendlyBuildTime: timeString,
   }
 
   if (scrapingHeaders.requiredHall) {

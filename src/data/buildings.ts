@@ -1,4 +1,4 @@
-import { VillageBuildingScrapingCollection } from './types'
+import { VillageBuildingScrapingCollection } from '../types'
 
 export const defaultHomeScrapingHeaders = {
   level: 'Level',
@@ -43,6 +43,13 @@ export const homeVillage: VillageBuildingScrapingCollection = {
       { name: 'Seeking Air Mine' },
       { name: 'Skeleton Trap' },
       { name: 'Tornado Trap' },
+      {
+        name: 'Walls',
+        indexesToSkip: {
+          headers: [4, 6],
+          rows: [4, 6],
+        },
+      },
     ],
     army: [
       { name: 'Army Camp' },
@@ -102,6 +109,14 @@ export const builderBase: VillageBuildingScrapingCollection = {
       { name: 'Spring Trap', urlSuffix: BUILDER_BASE_SUFFIX },
       { name: 'Mine', urlSuffix: BUILDER_BASE_SUFFIX },
       { name: 'Mega Mine', urlSuffix: BUILDER_BASE_SUFFIX },
+      {
+        name: 'Walls',
+        urlSuffix: BUILDER_BASE_SUFFIX,
+        indexesToSkip: {
+          headers: [4, 6],
+          rows: [4, 6],
+        },
+      },
     ],
     army: [
       { name: 'Builder Barracks' },
@@ -124,10 +139,9 @@ export const builderBase: VillageBuildingScrapingCollection = {
 }
 
 // Home Village
-// Walls
+
 // Heroes
 
 // Builder Base
 // Walls
 // Battle Machine
-// O.T.T.O Hut

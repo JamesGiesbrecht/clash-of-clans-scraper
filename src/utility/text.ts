@@ -13,11 +13,16 @@ export const camelize = (str: string): string => {
 export const ucFirst = (str: string): string =>
   str.charAt(0).toUpperCase() + str.slice(1)
 
-export const convertTimeStringToSeconds = (timeString: string): number => {
-  if (timeString === 'N/A' || timeString === '' || timeString === 'None')
-    return 0
-  if (!timeString)
-    throw new Error('Error converting time string, time string is undefined')
+export const convertTimeStringToSeconds = (
+  timeString: string,
+): { seconds: number; timeString: string } => {
+  if (
+    timeString === 'N/A' ||
+    timeString === '' ||
+    timeString === 'None' ||
+    !timeString
+  )
+    return { seconds: 0, timeString: 'N/A' }
   const timeParts = timeString.split(' ')
 
   const seconds: number = timeParts.reduce((acc: number, timePart: string) => {
@@ -38,7 +43,7 @@ export const convertTimeStringToSeconds = (timeString: string): number => {
     }
   }, 0)
 
-  return seconds
+  return { seconds, timeString }
 }
 
 export const parseNumber = (str: string): number => {
