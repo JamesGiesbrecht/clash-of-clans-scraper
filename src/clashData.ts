@@ -6,8 +6,16 @@ import {
   homeVillage,
 } from './data/buildings'
 import {
+  builderBaseHeroes,
+  defaultBuilderHeroScrapingHeaders,
+  defaultHomeHeroScrapingHeaders,
+  homeVillageHeroes,
+} from './data/troops'
+import {
   Building,
   BuildingType,
+  Hero,
+  HeroScrapingCollection,
   Level,
   Resource,
   ScrapingHeaders,
@@ -28,23 +36,23 @@ import {
 
 const WIKI_BASE_URL = 'https://clashofclans.fandom.com/wiki/'
 
-const fetchBuildingPages = async (
-  buildingsList: ScrapingTemplate[],
-): Promise<{ buildingInfo: ScrapingTemplate; page: cheerio.Root }[]> => {
-  const buildingPages = await Promise.all(
-    buildingsList.map(async (buildingInfo) => {
-      console.log('Fetching', buildingInfo.name)
+const fetchPages = async (
+  pageList: ScrapingTemplate[],
+): Promise<{ info: ScrapingTemplate; page: cheerio.Root }[]> => {
+  const pages = await Promise.all(
+    pageList.map(async (info) => {
+      console.log('Fetching', info.name)
       return {
-        buildingInfo,
+        info,
         page: await getPage(
           WIKI_BASE_URL +
-            buildingInfo.name.replaceAll(' ', '_') +
-            (buildingInfo.urlSuffix || ''),
+            info.name.replaceAll(' ', '_') +
+            (info.urlSuffix || ''),
         ),
       }
     }),
   )
-  return buildingPages
+  return pages
 }
 
 const formatLevel = (
@@ -74,7 +82,7 @@ const scrapeBuilding = (
   defaultScrapingHeaders: ScrapingHeaders,
   buildingType: BuildingType,
   $: cheerio.Root,
-) => {
+): Building => {
   const scrapingHeaders = {
     ...defaultScrapingHeaders,
     ...buildingInfo.scraping,
@@ -110,17 +118,49 @@ const scrapeBuilding = (
   return building
 }
 
+const scrapeHero = (
+  heroInfo: ScrapingTemplate,
+  defaultScrapingHeaders: ScrapingHeaders,
+  $: cheerio.Root,
+): Hero => {
+  const scrapingHeaders = {
+    ...defaultScrapingHeaders,
+    ...heroInfo.scraping,
+  }
+
+  const statsTable = getStatsTable($)
+  const statsTableAsJson = convertTableToJson(
+    $,
+    statsTable,
+    heroInfo.indexesToSkip,
+  )
+
+  const resource: Resource = $('th', statsTable)
+    .filter((i, el) => $(el).text().trim() === scrapingHeaders.buildCost)
+    .children('a')
+    .last()
+    .attr('title') as Resource
+  const hero: Hero = {
+    name: heroInfo.name,
+    resource,
+    levels: statsTableAsJson.map((rawLevel: any) =>
+      formatLevel(rawLevel, scrapingHeaders),
+    ),
+  }
+  return hero
+}
+
 const getBuildings = async (
   scrapingHeaders: ScrapingHeaders,
   village: VillageBuildingScrapingCollection,
 ) => {
   const buildings: Array<Building | SpecialtyBuilding> = []
   for (const [category, buildingsList] of Object.entries(village.buildings)) {
-    const pages = await fetchBuildingPages(buildingsList)
+    const pages = await fetchPages(buildingsList)
     buildings.push(
-      ...pages.map(({ buildingInfo, page }) =>
+      ...pages.map(({ info, page }) =>
         scrapeBuilding(
-          buildingInfo,
+          info,
           scrapingHeaders,
           ucFirst(category) as BuildingType,
           page,
@@ -134,8 +174,29 @@ const getBuildings = async (
   return buildings
 }
 
+const getHeroes = async (
+  scrapingHeaders: ScrapingHeaders,
+  heroesCollection: HeroScrapingCollection,
+) => {
+  const heroes: Array<Hero> = []
+  const heroNames = Object.keys(heroesCollection).map(
+    (hero) => heroesCollection[hero],
+  )
+  const pages = await fetchPages(heroNames)
+  heroes.push(
+    ...pages.map(({ info, page }) => scrapeHero(info, scrapingHeaders, page)),
+  )
+  return heroes
+}
+
 export const getHomeVillageBuildings = async () =>
   getBuildings(defaultHomeScrapingHeaders, homeVillage)
 
 export const getBuilderBaseBuildings = async () =>
   getBuildings(defaultBuilderScrapingHeaders, builderBase)
+
+export const getHomeVillageHeroes = async () =>
+  getHeroes(defaultHomeHeroScrapingHeaders, homeVillageHeroes)
+
+export const getBuilderBaseHeroes = async () =>
+  getHeroes(defaultBuilderHeroScrapingHeaders, builderBaseHeroes)

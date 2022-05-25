@@ -1,13 +1,13 @@
-import { VillageBuildingScrapingCollection } from '../types'
+import { ScrapingHeaders, VillageBuildingScrapingCollection } from '../types'
 
-export const defaultHomeScrapingHeaders = {
+export const defaultHomeScrapingHeaders: ScrapingHeaders = {
   level: 'Level',
   buildCost: 'Build Cost',
   buildTime: 'Build Time',
   requiredHall: 'Town Hall Level Required',
 }
 
-export const defaultBuilderScrapingHeaders = {
+export const defaultBuilderScrapingHeaders: ScrapingHeaders = {
   ...defaultHomeScrapingHeaders,
   requiredHall: 'Builder Hall Level Required',
 }
