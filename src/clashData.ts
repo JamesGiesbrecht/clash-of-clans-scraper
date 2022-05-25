@@ -7,21 +7,28 @@ import {
 } from './data/buildings'
 import {
   builderBaseHeroes,
+  builderBaseTroops,
   defaultBuilderHeroScrapingHeaders,
+  defaultBuilderTroopScrapingHeaders,
   defaultHomeHeroScrapingHeaders,
+  defaultHomeTroopScrapingHeaders,
   homeVillageHeroes,
+  homeVillageTroops,
 } from './data/troops'
 import {
   Building,
   BuildingType,
   Hero,
-  HeroScrapingCollection,
-  Level,
+  HeroTroopScrapingCollection,
+  BuildingLevel,
   Resource,
   ScrapingHeaders,
   ScrapingTemplate,
   SpecialtyBuilding,
   VillageBuildingScrapingCollection,
+  HeroLevel,
+  Troop,
+  TroopLevel,
 } from './types'
 import {
   convertAvailabilityTableToJson,
@@ -55,14 +62,14 @@ const fetchPages = async (
   return pages
 }
 
-const formatLevel = (
+const formatBuildingLevel = (
   rawLevel: { [key: string]: string },
   scrapingHeaders: ScrapingHeaders,
-): Level => {
+): BuildingLevel => {
   const { seconds, timeString } = convertTimeStringToSeconds(
     rawLevel[scrapingHeaders.buildTime],
   )
-  const level: Level = {
+  const level: BuildingLevel = {
     level: parseNumber(rawLevel[scrapingHeaders.level]),
     buildCost: parseNumber(
       rawLevel[scrapingHeaders.buildCost] || rawLevel.Cost,
@@ -74,6 +81,46 @@ const formatLevel = (
   if (scrapingHeaders.requiredHall) {
     level.requiredHall = parseNumber(rawLevel[scrapingHeaders.requiredHall])
   }
+  return level
+}
+
+const formatHeroLevel = (
+  rawLevel: { [key: string]: string },
+  scrapingHeaders: ScrapingHeaders,
+): HeroLevel => {
+  const { seconds, timeString } = convertTimeStringToSeconds(
+    rawLevel[scrapingHeaders.buildTime],
+  )
+  const level: HeroLevel = {
+    level: parseNumber(rawLevel[scrapingHeaders.level]),
+    upgradeCost: parseNumber(
+      rawLevel[scrapingHeaders.buildCost] || rawLevel.Cost,
+    ),
+    upgradeTime: seconds,
+    friendlyUpgradeTime: timeString,
+    requiredHall: parseNumber(rawLevel[scrapingHeaders.requiredHall]),
+  }
+
+  return level
+}
+
+const formatTroopLevel = (
+  rawLevel: { [key: string]: string },
+  scrapingHeaders: ScrapingHeaders,
+): TroopLevel => {
+  const { seconds, timeString } = convertTimeStringToSeconds(
+    rawLevel[scrapingHeaders.buildTime],
+  )
+  const level: TroopLevel = {
+    level: parseNumber(rawLevel[scrapingHeaders.level]),
+    researchCost: parseNumber(
+      rawLevel[scrapingHeaders.buildCost] || rawLevel.Cost,
+    ),
+    researchTime: seconds,
+    friendlyResearchTime: timeString,
+    requiredLab: parseNumber(rawLevel[scrapingHeaders.requiredHall]),
+  }
+
   return level
 }
 
@@ -110,7 +157,7 @@ const scrapeBuilding = (
     resource,
     type: buildingType,
     levels: statsTableAsJson.map((rawLevel: any) =>
-      formatLevel(rawLevel, scrapingHeaders),
+      formatBuildingLevel(rawLevel, scrapingHeaders),
     ),
     availability: availabilityTableAsJson,
   }
@@ -144,10 +191,50 @@ const scrapeHero = (
     name: heroInfo.name,
     resource,
     levels: statsTableAsJson.map((rawLevel: any) =>
-      formatLevel(rawLevel, scrapingHeaders),
+      formatHeroLevel(rawLevel, scrapingHeaders),
     ),
   }
   return hero
+}
+
+const scrapeTroop = (
+  troopInfo: ScrapingTemplate,
+  defaultScrapingHeaders: ScrapingHeaders,
+  $: cheerio.Root,
+): Troop => {
+  const scrapingHeaders = {
+    ...defaultScrapingHeaders,
+    ...troopInfo.scraping,
+  }
+
+  const statsTable = getStatsTable($)
+  const statsTableAsJson = convertTableToJson(
+    $,
+    statsTable,
+    troopInfo.indexesToSkip,
+  )
+
+  const resource: Resource = $('th', statsTable)
+    .filter((i, el) => $(el).text().trim() === scrapingHeaders.buildCost)
+    .children('a')
+    .last()
+    .attr('title') as Resource
+  const troop: Troop = {
+    name: troopInfo.name,
+    resource,
+    requiredBarracks: 1,
+    levels: statsTableAsJson.map((rawLevel: any) => {
+      console.log(
+        'Formatting troop level',
+        troopInfo.name,
+        rawLevel,
+        scrapingHeaders,
+      )
+      return formatTroopLevel(rawLevel, scrapingHeaders)
+    }),
+  }
+
+  return troop
 }
 
 const getBuildings = async (
@@ -174,17 +261,16 @@ const getBuildings = async (
   return buildings
 }
 
-const getHeroes = async (
+const getHeroesTroops = async (
   scrapingHeaders: ScrapingHeaders,
-  heroesCollection: HeroScrapingCollection,
+  heroesTroopsCollection: HeroTroopScrapingCollection,
+  isHero?: boolean,
 ) => {
-  const heroes: Array<Hero> = []
-  const heroNames = Object.keys(heroesCollection).map(
-    (hero) => heroesCollection[hero],
-  )
-  const pages = await fetchPages(heroNames)
+  const heroes: Array<Hero | Troop> = []
+  const pages = await fetchPages(heroesTroopsCollection)
+  const scrape = isHero ? scrapeHero : scrapeTroop
   heroes.push(
-    ...pages.map(({ info, page }) => scrapeHero(info, scrapingHeaders, page)),
+    ...pages.map(({ info, page }) => scrape(info, scrapingHeaders, page)),
   )
   return heroes
 }
@@ -196,7 +282,13 @@ export const getBuilderBaseBuildings = async () =>
   getBuildings(defaultBuilderScrapingHeaders, builderBase)
 
 export const getHomeVillageHeroes = async () =>
-  getHeroes(defaultHomeHeroScrapingHeaders, homeVillageHeroes)
+  getHeroesTroops(defaultHomeHeroScrapingHeaders, homeVillageHeroes, true)
 
 export const getBuilderBaseHeroes = async () =>
-  getHeroes(defaultBuilderHeroScrapingHeaders, builderBaseHeroes)
+  getHeroesTroops(defaultBuilderHeroScrapingHeaders, builderBaseHeroes, true)
+
+export const getHomeVillageTroops = async () =>
+  getHeroesTroops(defaultHomeTroopScrapingHeaders, homeVillageTroops)
+
+export const getBuilderBaseTroops = async () =>
+  getHeroesTroops(defaultBuilderTroopScrapingHeaders, builderBaseTroops)

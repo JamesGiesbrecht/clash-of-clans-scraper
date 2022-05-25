@@ -15,7 +15,7 @@ export type Availability = {
   [key: number]: number
 }
 
-export type Level = {
+export type BuildingLevel = {
   level: number
   buildCost: number
   buildTime: number
@@ -23,24 +23,47 @@ export type Level = {
   requiredHall?: number
 }
 
+export type HeroLevel = {
+  level: number
+  upgradeCost: number
+  upgradeTime: number
+  friendlyUpgradeTime: string
+  requiredHall: number
+}
+
+export type TroopLevel = {
+  level: number
+  researchCost: number
+  researchTime: number
+  friendlyResearchTime: string
+  requiredLab: number
+}
+
 export type Building = {
   name: string
   resource: Resource
   type: BuildingType
-  levels: Level[]
+  levels: BuildingLevel[]
   availability: Availability
 }
 
 export type Hero = {
   name: string
   resource: Resource
-  levels: Level[]
+  levels: HeroLevel[]
+}
+
+export type Troop = {
+  name: string
+  resource: Resource
+  requiredBarracks: number
+  levels: TroopLevel[]
 }
 
 export type SpecialtyBuilding = Overwrite<
   Building,
   {
-    levels: Array<Level | { level: number; requirement: any }>
+    levels: Array<BuildingLevel | { level: number; requirement: any }>
   }
 >
 
@@ -72,6 +95,4 @@ export type VillageBuildingScrapingCollection = {
   specialtyBuildings?: SpecialtyBuilding[]
 }
 
-export type HeroScrapingCollection = {
-  [key: string]: ScrapingTemplate
-}
+export type HeroTroopScrapingCollection = ScrapingTemplate[]
