@@ -2,8 +2,8 @@ import { ScrapingHeaders, VillageBuildingScrapingCollection } from '../types'
 
 export const defaultHomeScrapingHeaders: ScrapingHeaders = {
   level: 'Level',
-  buildCost: 'Build Cost',
-  buildTime: 'Build Time',
+  cost: 'Build Cost',
+  time: 'Build Time',
   requiredHall: 'Town Hall Level Required',
 }
 

@@ -1,21 +1,9 @@
 import { ScrapingTemplate, ScrapingHeaders } from '../types'
 
-export const defaultHomeHeroScrapingHeaders: ScrapingHeaders = {
-  level: 'Level',
-  buildCost: 'Upgrade Cost',
-  buildTime: 'Upgrade Time',
-  requiredHall: 'Town Hall Level Required',
-}
-
-export const defaultBuilderHeroScrapingHeaders: ScrapingHeaders = {
-  ...defaultHomeHeroScrapingHeaders,
-  requiredHall: 'Builder Hall Level Required',
-}
-
 export const defaultHomeTroopScrapingHeaders: ScrapingHeaders = {
   level: 'Level',
-  buildCost: 'Research Cost',
-  buildTime: 'Research Time',
+  cost: 'Research Cost',
+  time: 'Research Time',
   requiredHall: 'Laboratory Level Required',
 }
 
@@ -23,17 +11,6 @@ export const defaultBuilderTroopScrapingHeaders: ScrapingHeaders = {
   ...defaultHomeTroopScrapingHeaders,
   requiredHall: 'Star Laboratory Level Required',
 }
-
-export const homeVillageHeroes: ScrapingTemplate[] = [
-  { name: 'Barbarian King' },
-  { name: 'Archer Queen' },
-  { name: 'Grand Warden', indexesToSkip: { headers: [5], rows: [5, 6] } },
-  { name: 'Royal Champion' },
-]
-
-export const builderBaseHeroes: ScrapingTemplate[] = [
-  { name: 'Battle Machine' },
-]
 
 export const homeVillageTroops: ScrapingTemplate[] = [
   { name: 'Barbarian' },

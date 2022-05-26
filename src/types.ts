@@ -101,8 +101,8 @@ export type IndexesToSkip = {
 
 export type ScrapingHeaders = {
   level?: string
-  buildCost?: string
-  buildTime?: string
+  cost?: string
+  time?: string
   requiredHall?: string
 }
 

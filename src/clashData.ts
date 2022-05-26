@@ -6,15 +6,17 @@ import {
   homeVillage,
 } from './data/buildings'
 import {
-  builderBaseHeroes,
   builderBaseTroops,
-  defaultBuilderHeroScrapingHeaders,
   defaultBuilderTroopScrapingHeaders,
-  defaultHomeHeroScrapingHeaders,
   defaultHomeTroopScrapingHeaders,
-  homeVillageHeroes,
   homeVillageTroops,
 } from './data/troops'
+import {
+  builderBaseHeroes,
+  defaultBuilderHeroScrapingHeaders,
+  defaultHomeHeroScrapingHeaders,
+  homeVillageHeroes,
+} from './data/heroes'
 import {
   Building,
   BuildingType,
@@ -67,13 +69,11 @@ const formatBuildingLevel = (
   scrapingHeaders: ScrapingHeaders,
 ): BuildingLevel => {
   const { seconds, timeString } = convertTimeStringToSeconds(
-    rawLevel[scrapingHeaders.buildTime],
+    rawLevel[scrapingHeaders.time],
   )
   const level: BuildingLevel = {
     level: parseNumber(rawLevel[scrapingHeaders.level]),
-    buildCost: parseNumber(
-      rawLevel[scrapingHeaders.buildCost] || rawLevel.Cost,
-    ),
+    buildCost: parseNumber(rawLevel[scrapingHeaders.cost] || rawLevel.Cost),
     buildTime: seconds,
     friendlyBuildTime: timeString,
   }
@@ -89,13 +89,11 @@ const formatHeroLevel = (
   scrapingHeaders: ScrapingHeaders,
 ): HeroLevel => {
   const { seconds, timeString } = convertTimeStringToSeconds(
-    rawLevel[scrapingHeaders.buildTime],
+    rawLevel[scrapingHeaders.time],
   )
   const level: HeroLevel = {
     level: parseNumber(rawLevel[scrapingHeaders.level]),
-    upgradeCost: parseNumber(
-      rawLevel[scrapingHeaders.buildCost] || rawLevel.Cost,
-    ),
+    upgradeCost: parseNumber(rawLevel[scrapingHeaders.cost] || rawLevel.Cost),
     upgradeTime: seconds,
     friendlyUpgradeTime: timeString,
     requiredHall: parseNumber(rawLevel[scrapingHeaders.requiredHall]),
@@ -109,13 +107,11 @@ const formatTroopLevel = (
   scrapingHeaders: ScrapingHeaders,
 ): TroopSpellSiegeMachineLevel => {
   const { seconds, timeString } = convertTimeStringToSeconds(
-    rawLevel[scrapingHeaders.buildTime],
+    rawLevel[scrapingHeaders.time],
   )
   const level: TroopSpellSiegeMachineLevel = {
     level: parseNumber(rawLevel[scrapingHeaders.level]),
-    researchCost: parseNumber(
-      rawLevel[scrapingHeaders.buildCost] || rawLevel.Cost,
-    ),
+    researchCost: parseNumber(rawLevel[scrapingHeaders.cost] || rawLevel.Cost),
     researchTime: seconds,
     friendlyResearchTime: timeString,
     requiredLab: parseNumber(rawLevel[scrapingHeaders.requiredHall]),
@@ -148,7 +144,7 @@ const scrapeBuilding = (
   )
 
   const resource: Resource = $('th', statsTable)
-    .filter((i, el) => $(el).text().trim() === scrapingHeaders.buildCost)
+    .filter((i, el) => $(el).text().trim() === scrapingHeaders.cost)
     .children('a')
     .last()
     .attr('title') as Resource
@@ -183,7 +179,7 @@ const scrapeHero = (
   )
 
   const resource: Resource = $('th', statsTable)
-    .filter((i, el) => $(el).text().trim() === scrapingHeaders.buildCost)
+    .filter((i, el) => $(el).text().trim() === scrapingHeaders.cost)
     .children('a')
     .last()
     .attr('title') as Resource
@@ -218,7 +214,7 @@ const scrapeTroop = (
   const troopInfoTableAsJson = convertTableToJson($, troopInfoTable)[0]
 
   const resource: Resource = $('th', statsTable)
-    .filter((i, el) => $(el).text().trim() === scrapingHeaders.buildCost)
+    .filter((i, el) => $(el).text().trim() === scrapingHeaders.cost)
     .children('a')
     .last()
     .attr('title') as Resource

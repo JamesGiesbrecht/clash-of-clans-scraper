@@ -2,8 +2,8 @@ import { ScrapingTemplate, ScrapingHeaders } from '../types'
 
 export const defaultSiegeMachineScrapingHeaders: ScrapingHeaders = {
   level: 'Level',
-  buildCost: 'Research Cost',
-  buildTime: 'Research Time',
+  cost: 'Research Cost',
+  time: 'Research Time',
   requiredHall: 'Laboratory Level Required',
 }
 
