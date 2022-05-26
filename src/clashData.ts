@@ -19,7 +19,6 @@ import {
   Building,
   BuildingType,
   Hero,
-  HeroTroopScrapingCollection,
   BuildingLevel,
   Resource,
   ScrapingHeaders,
@@ -266,7 +265,7 @@ const getBuildings = async (
 
 const getHeroesTroops = async (
   scrapingHeaders: ScrapingHeaders,
-  heroesTroopsCollection: HeroTroopScrapingCollection,
+  heroesTroopsCollection: ScrapingTemplate[],
   isHero?: boolean,
 ) => {
   const heroes: Array<Hero | Troop> = []

@@ -121,5 +121,3 @@ export type VillageBuildingScrapingCollection = {
   }
   specialtyBuildings?: SpecialtyBuilding[]
 }
-
-export type HeroTroopScrapingCollection = ScrapingTemplate[]
