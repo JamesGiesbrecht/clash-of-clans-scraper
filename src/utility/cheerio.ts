@@ -35,6 +35,18 @@ export const getAvailabilityTable = ($: cheerio.Root): cheerio.Cheerio => {
     .first()
 }
 
+export const getTroopInfoTable = ($: cheerio.Root): cheerio.Cheerio => {
+  let troopInfoTableIndex
+  $('table').each((i, el) => {
+    const tableText = $(el).text()
+    if (tableText.includes('Barracks Level Required')) {
+      troopInfoTableIndex = i
+    }
+  })
+  if (!troopInfoTableIndex) throw new Error('Could not find troop info table')
+  return $('table').eq(troopInfoTableIndex).first()
+}
+
 export const convertTableToJson = (
   $: cheerio.Root,
   table: cheerio.Cheerio,

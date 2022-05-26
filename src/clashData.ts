@@ -37,6 +37,7 @@ import {
   getAvailabilityTable,
   getPage,
   getStatsTable,
+  getTroopInfoTable,
   parseNumber,
   ucFirst,
 } from './utility'
@@ -214,22 +215,24 @@ const scrapeTroop = (
     troopInfo.indexesToSkip,
   )
 
+  const troopInfoTable = getTroopInfoTable($)
+  const troopInfoTableAsJson = convertTableToJson($, troopInfoTable)[0]
+
   const resource: Resource = $('th', statsTable)
     .filter((i, el) => $(el).text().trim() === scrapingHeaders.buildCost)
     .children('a')
     .last()
     .attr('title') as Resource
+
   const troop: Troop = {
     name: troopInfo.name,
     resource,
-    requiredBarracks: 1,
+    requiredBarracks: parseNumber(
+      troopInfoTableAsJson['Barracks Level Required'] ||
+        troopInfoTableAsJson['Builder Barracks Level Required'] ||
+        troopInfoTableAsJson['Dark Barracks Level Required'],
+    ),
     levels: statsTableAsJson.map((rawLevel: any) => {
-      console.log(
-        'Formatting troop level',
-        troopInfo.name,
-        rawLevel,
-        scrapingHeaders,
-      )
       return formatTroopLevel(rawLevel, scrapingHeaders)
     }),
   }

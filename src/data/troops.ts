@@ -46,7 +46,7 @@ export const homeVillageTroops: HeroTroopScrapingCollection = [
   { name: 'Healer' },
   { name: 'Dragon' },
   { name: 'P.E.K.K.A' },
-  { name: 'Baby Dragon' },
+  { name: 'Baby Dragon', urlSuffix: '/Home_Village' },
   { name: 'Miner' },
   { name: 'Electro Dragon' },
   { name: 'Yeti' },
@@ -67,8 +67,7 @@ export const builderBaseTroops: HeroTroopScrapingCollection = [
   { name: 'Sneaky Archer' },
   { name: 'Boxer Giant' },
   { name: 'Beta Minion' },
-  // TODO: Fix poorly formatted table
-  // { name: 'Bomber' },
+  { name: 'Bomber' },
   { name: 'Baby Dragon', urlSuffix: '/Builder_Base' },
   { name: 'Cannon Cart' },
   { name: 'Night Witch' },
