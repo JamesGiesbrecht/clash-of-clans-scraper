@@ -28,7 +28,7 @@ import {
   VillageBuildingScrapingCollection,
   HeroLevel,
   Troop,
-  TroopLevel,
+  TroopSpellSiegeMachineLevel,
 } from './types'
 import {
   convertAvailabilityTableToJson,
@@ -108,11 +108,11 @@ const formatHeroLevel = (
 const formatTroopLevel = (
   rawLevel: { [key: string]: string },
   scrapingHeaders: ScrapingHeaders,
-): TroopLevel => {
+): TroopSpellSiegeMachineLevel => {
   const { seconds, timeString } = convertTimeStringToSeconds(
     rawLevel[scrapingHeaders.buildTime],
   )
-  const level: TroopLevel = {
+  const level: TroopSpellSiegeMachineLevel = {
     level: parseNumber(rawLevel[scrapingHeaders.level]),
     researchCost: parseNumber(
       rawLevel[scrapingHeaders.buildCost] || rawLevel.Cost,

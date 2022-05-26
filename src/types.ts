@@ -23,15 +23,18 @@ export type BuildingLevel = {
   requiredHall?: number
 }
 
-export type HeroLevel = {
+export type PetLevel = {
   level: number
   upgradeCost: number
   upgradeTime: number
   friendlyUpgradeTime: string
+}
+
+export type HeroLevel = PetLevel & {
   requiredHall: number
 }
 
-export type TroopLevel = {
+export type TroopSpellSiegeMachineLevel = {
   level: number
   researchCost: number
   researchTime: number
@@ -57,7 +60,31 @@ export type Troop = {
   name: string
   resource: Resource
   requiredBarracks: number
-  levels: TroopLevel[]
+  levels: TroopSpellSiegeMachineLevel[]
+}
+
+// TODO
+export type Spell = {
+  name: string
+  resource: Resource
+  requiredSpellFactory: number
+  levels: TroopSpellSiegeMachineLevel[]
+}
+
+// TODO
+export type SiegeMachine = {
+  name: string
+  resource: Resource
+  requiredWorkshop: number
+  levels: TroopSpellSiegeMachineLevel[]
+}
+
+// TODO
+export type Pet = {
+  name: string
+  resource: Resource
+  requiredPetHouse: number
+  levels: PetLevel[]
 }
 
 export type SpecialtyBuilding = Overwrite<
