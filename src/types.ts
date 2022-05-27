@@ -77,7 +77,6 @@ export type SiegeMachine = {
   levels: TroopSpellSiegeMachineLevel[]
 }
 
-// TODO
 export type Pet = {
   name: string
   resource: Resource

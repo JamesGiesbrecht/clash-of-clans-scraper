@@ -32,6 +32,8 @@ import {
   TroopSpellSiegeMachineLevel,
   SiegeMachine,
   Troop,
+  Pet,
+  PetLevel,
 } from './types'
 import {
   convertAvailabilityTableToJson,
@@ -49,6 +51,7 @@ import {
   defaultSiegeMachineScrapingHeaders,
   siegeMachines,
 } from './data/siegeMachines'
+import { defaultPetsScrapingHeaders, pets } from './data/pets'
 
 const WIKI_BASE_URL = 'https://clashofclans.fandom.com/wiki/'
 
@@ -122,6 +125,23 @@ const formatTroopSpellSiegeMachineLevel = (
     researchTime: seconds,
     friendlyResearchTime: timeString,
     requiredLab: parseNumber(rawLevel[scrapingHeaders.requiredHall]),
+  }
+
+  return level
+}
+
+const formatPetLevel = (
+  rawLevel: { [key: string]: string },
+  scrapingHeaders: ScrapingHeaders,
+): PetLevel => {
+  const { seconds, timeString } = convertTimeStringToSeconds(
+    rawLevel[scrapingHeaders.time],
+  )
+  const level: PetLevel = {
+    level: parseNumber(rawLevel[scrapingHeaders.level]),
+    upgradeCost: parseNumber(rawLevel[scrapingHeaders.cost] || rawLevel.Cost),
+    upgradeTime: seconds,
+    friendlyUpgradeTime: timeString,
   }
 
   return level
@@ -247,8 +267,6 @@ const scrapeSpell = (
   const spellInfoTable = getTableByTableText($, 'Spell Factory Level Required')
   const spellInfoTableAsJson = convertTableToJson($, spellInfoTable)[0]
 
-  console.log(`Formatting ${spellInfo.name}`)
-
   const spell: Spell = {
     name: spellInfo.name,
     resource,
@@ -283,7 +301,6 @@ const scrapeSiegeMachine = (
     $,
     siegeMachineInfoTable,
   )[0]
-  console.log(`Formatting ${siegeMachineInfo.name}`)
 
   const siegeMachine: SiegeMachine = {
     name: siegeMachineInfo.name,
@@ -299,6 +316,35 @@ const scrapeSiegeMachine = (
   return siegeMachine
 }
 
+const scrapePets = (
+  petInfo: ScrapingTemplate,
+  defaultScrapingHeaders: ScrapingHeaders,
+  $: cheerio.Root,
+): Pet => {
+  const { scrapingHeaders, resource, statsTableAsJson } = scrapePrep(
+    defaultScrapingHeaders,
+    petInfo,
+    $,
+  )
+
+  const petInfoTable = getTableByTableText($, 'Pet House Level Required')
+  const petInfoTableAsJson = convertTableToJson($, petInfoTable)[0]
+  console.log(`Formatting ${petInfo.name}`)
+
+  const pet: Pet = {
+    name: petInfo.name,
+    resource,
+    requiredPetHouse: parseNumber(
+      petInfoTableAsJson['Pet House Level Required'],
+    ),
+    levels: statsTableAsJson.map((rawLevel: any) => {
+      return formatPetLevel(rawLevel, scrapingHeaders)
+    }),
+  }
+
+  return pet
+}
+
 const getBuildings = async (
   scrapingHeaders: ScrapingHeaders,
   village: VillageBuildingScrapingCollection,
@@ -307,14 +353,15 @@ const getBuildings = async (
   for (const [category, buildingsList] of Object.entries(village.buildings)) {
     const pages = await fetchPages(buildingsList)
     buildings.push(
-      ...pages.map(({ info, page }) =>
-        scrapeBuilding(
+      ...pages.map(({ info, page }) => {
+        console.log(`Scraping ${info.name}`)
+        return scrapeBuilding(
           info,
           scrapingHeaders,
           ucFirst(category) as BuildingType,
           page,
-        ),
-      ),
+        )
+      }),
     )
   }
   if (village.specialtyBuildings) {
@@ -330,12 +377,15 @@ const getArmy = async (
     info: ScrapingTemplate,
     defaultScrapingHeaders: ScrapingHeaders,
     $: cheerio.Root,
-  ) => Hero | Troop | Spell | SiegeMachine,
+  ) => Hero | Troop | Spell | SiegeMachine | Pet,
 ) => {
-  const army: Array<Hero | Troop | Spell | SiegeMachine> = []
+  const army: Array<Hero | Troop | Spell | SiegeMachine | Pet> = []
   const pages = await fetchPages(heroesTroopsCollection)
   army.push(
-    ...pages.map(({ info, page }) => scrape(info, scrapingHeaders, page)),
+    ...pages.map(({ info, page }) => {
+      console.log(`Scraping ${info.name}`)
+      return scrape(info, scrapingHeaders, page)
+    }),
   )
   return army
 }
@@ -363,3 +413,6 @@ export const getSpells = async () =>
 
 export const getSiegeMachines = async () =>
   getArmy(defaultSiegeMachineScrapingHeaders, siegeMachines, scrapeSiegeMachine)
+
+export const getPets = async () =>
+  getArmy(defaultPetsScrapingHeaders, pets, scrapePets)
