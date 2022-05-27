@@ -21,6 +21,21 @@ export const getStatsTable = ($: cheerio.Root): cheerio.Cheerio => {
     .first()
 }
 
+export const getTableByTableText = (
+  $: cheerio.Root,
+  identifier: string | string[],
+) => {
+  return $('table')
+    .filter((i, el) => {
+      const tableText = $(el).text()
+      if (Array.isArray(identifier)) {
+        return identifier.some((id) => tableText.includes(id))
+      }
+      return tableText.includes(identifier)
+    })
+    .first()
+}
+
 export const getAvailabilityTable = ($: cheerio.Root): cheerio.Cheerio => {
   return $('table')
     .filter((i, el) => {
@@ -35,17 +50,17 @@ export const getAvailabilityTable = ($: cheerio.Root): cheerio.Cheerio => {
     .first()
 }
 
-export const getTroopInfoTable = ($: cheerio.Root): cheerio.Cheerio => {
-  let troopInfoTableIndex
-  $('table').each((i, el) => {
-    const tableText = $(el).text()
-    if (tableText.includes('Barracks Level Required')) {
-      troopInfoTableIndex = i
-    }
-  })
-  if (!troopInfoTableIndex) throw new Error('Could not find troop info table')
-  return $('table').eq(troopInfoTableIndex).first()
-}
+// export const getTroopInfoTable = ($: cheerio.Root): cheerio.Cheerio => {
+//   let troopInfoTableIndex
+//   $('table').each((i, el) => {
+//     const tableText = $(el).text()
+//     if (tableText.includes('Barracks Level Required')) {
+//       troopInfoTableIndex = i
+//     }
+//   })
+//   if (!troopInfoTableIndex) throw new Error('Could not find troop info table')
+//   return $('table').eq(troopInfoTableIndex).first()
+// }
 
 export const convertTableToJson = (
   $: cheerio.Root,

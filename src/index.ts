@@ -5,11 +5,11 @@ import {
   getHomeVillageBuildings,
   getHomeVillageHeroes,
   getHomeVillageTroops,
+  getSiegeMachines,
+  getSpells,
 } from './clashData'
 import { writeJsonToFile } from './utility'
 
-// TODO: Spells
-// TODO: Siege Machines
 // TODO: Pets
 
 const run = async (): Promise<void> => {
@@ -20,6 +20,8 @@ const run = async (): Promise<void> => {
     builderBaseHeroes,
     homeVillageTroops,
     builderBaseTroops,
+    spells,
+    siegeMachines,
   ] = await Promise.all([
     getHomeVillageBuildings(),
     getBuilderBaseBuildings(),
@@ -27,6 +29,8 @@ const run = async (): Promise<void> => {
     getBuilderBaseHeroes(),
     getHomeVillageTroops(),
     getBuilderBaseTroops(),
+    getSpells(),
+    getSiegeMachines(),
   ])
   writeJsonToFile('home-village-buildings.json', homeVillageBuildings)
   writeJsonToFile('builder-base-buildings.json', builderBaseBuildings)
@@ -34,6 +38,8 @@ const run = async (): Promise<void> => {
   writeJsonToFile('builder-base-heroes.json', builderBaseHeroes)
   writeJsonToFile('home-village-troops.json', homeVillageTroops)
   writeJsonToFile('builder-base-troops.json', builderBaseTroops)
+  writeJsonToFile('spells.json', spells)
+  writeJsonToFile('siege-machines.json', siegeMachines)
 }
 
 run()

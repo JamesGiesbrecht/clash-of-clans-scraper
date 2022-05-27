@@ -63,7 +63,6 @@ export type Troop = {
   levels: TroopSpellSiegeMachineLevel[]
 }
 
-// TODO
 export type Spell = {
   name: string
   resource: Resource
@@ -71,7 +70,6 @@ export type Spell = {
   levels: TroopSpellSiegeMachineLevel[]
 }
 
-// TODO
 export type SiegeMachine = {
   name: string
   resource: Resource
