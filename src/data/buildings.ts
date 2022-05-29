@@ -121,11 +121,7 @@ export const builderBase: VillageBuildingScrapingCollection = {
         },
       },
     ],
-    army: [
-      { name: 'Builder Barracks' },
-      { name: 'Army Camp', urlSuffix: BUILDER_BASE_SUFFIX },
-      { name: 'Star Laboratory' },
-    ],
+    army: [{ name: 'Builder Barracks' }, { name: 'Star Laboratory' }],
     resource: [
       {
         name: 'Builder Hall',
@@ -141,8 +137,63 @@ export const builderBase: VillageBuildingScrapingCollection = {
   },
   specialtyBuildings: [
     {
+      name: 'Army Camp',
+      resource: 'Builder Elixir',
+      type: 'Army',
+      levels: [
+        {
+          level: 1,
+          imageUrl:
+            'https://static.wikia.nocookie.net/clashofclans/images/e/e4/Army_CampB.png',
+          requirement: {
+            '1': {
+              buildCost: 0,
+              buildTime: 0,
+              friendlyBuildTime: 'N/A',
+            },
+            '2': {
+              buildCost: 12000,
+              buildTime: 300,
+              friendlyBuildTime: '5m',
+            },
+            '3': {
+              buildCost: 180000,
+              buildTime: 10800,
+              friendlyBuildTime: '3h',
+            },
+            '4': {
+              buildCost: 350000,
+              buildTime: 28800,
+              friendlyBuildTime: '8h',
+            },
+            '5': {
+              buildCost: 2500000,
+              buildTime: 172800,
+              friendlyBuildTime: '2d',
+            },
+            '6': {
+              buildCost: 2500000,
+              buildTime: 172800,
+              friendlyBuildTime: '2d',
+            },
+          },
+        },
+      ],
+      availability: {
+        '1': 1,
+        '2': 2,
+        '3': 3,
+        '4': 4,
+        '5': 4,
+        '6': 4,
+        '7': 5,
+        '8': 6,
+        '9': 6,
+      },
+    },
+    {
       name: 'O.T.T.O. Hut',
-      resource: 'Gold',
+      resource: 'Builder Gold',
       type: 'Resource',
       levels: [
         {
