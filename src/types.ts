@@ -20,6 +20,7 @@ export type BuildingLevel = {
   buildCost: number
   buildTime: number
   friendlyBuildTime: string
+  imageUrl: string
   requiredHall?: number
 }
 
@@ -87,7 +88,9 @@ export type Pet = {
 export type SpecialtyBuilding = Overwrite<
   Building,
   {
-    levels: Array<BuildingLevel | { level: number; requirement: any }>
+    levels: Array<
+      BuildingLevel | { level: number; imageUrl: string; requirement: any }
+    >
   }
 >
 

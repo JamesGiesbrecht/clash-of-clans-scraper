@@ -12,22 +12,24 @@ export const defaultBuilderScrapingHeaders: ScrapingHeaders = {
   requiredHall: 'Builder Hall Level Required',
 }
 
+const HOME_VILLAGE_SUFFIX = '/Home_Village'
 const BUILDER_BASE_SUFFIX = '/Builder_Base'
 
 export const homeVillage: VillageBuildingScrapingCollection = {
   buildings: {
     defense: [
-      { name: 'Cannon' },
-      { name: 'Archer Tower' },
+      { name: 'Cannon', urlSuffix: HOME_VILLAGE_SUFFIX },
+      { name: 'Archer Tower', urlSuffix: HOME_VILLAGE_SUFFIX },
       { name: 'Mortar' },
-      { name: 'Air Defense' },
+      { name: 'Air Defense', urlSuffix: HOME_VILLAGE_SUFFIX },
       { name: 'Wizard Tower' },
       { name: 'Air Sweeper' },
-      { name: 'Hidden Tesla' },
-      { name: 'Bomb Tower' },
+      { name: 'Hidden Tesla', urlSuffix: HOME_VILLAGE_SUFFIX },
+      { name: 'Bomb Tower', urlSuffix: HOME_VILLAGE_SUFFIX },
       { name: 'X-Bow' },
       {
         name: 'Inferno Tower',
+        urlSuffix: HOME_VILLAGE_SUFFIX,
         indexesToSkip: {
           headers: [1, 2],
           rows: [1, 2, 3, 4, 5, 6],
@@ -44,7 +46,8 @@ export const homeVillage: VillageBuildingScrapingCollection = {
       { name: 'Skeleton Trap' },
       { name: 'Tornado Trap' },
       {
-        name: 'Walls',
+        name: 'Wall',
+        urlSuffix: HOME_VILLAGE_SUFFIX,
         indexesToSkip: {
           headers: [4, 6],
           rows: [4, 6],
@@ -52,7 +55,7 @@ export const homeVillage: VillageBuildingScrapingCollection = {
       },
     ],
     army: [
-      { name: 'Army Camp' },
+      { name: 'Army Camp', urlSuffix: HOME_VILLAGE_SUFFIX },
       { name: 'Barracks' },
       { name: 'Dark Barracks' },
       { name: 'Laboratory' },
@@ -68,11 +71,11 @@ export const homeVillage: VillageBuildingScrapingCollection = {
       { name: 'Pet House' },
     ],
     resource: [
-      { name: 'Gold Mine' },
-      { name: 'Elixir Collector' },
+      { name: 'Gold Mine', urlSuffix: HOME_VILLAGE_SUFFIX },
+      { name: 'Elixir Collector', urlSuffix: HOME_VILLAGE_SUFFIX },
       { name: 'Dark Elixir Drill' },
-      { name: 'Gold Storage' },
-      { name: 'Elixir Storage' },
+      { name: 'Gold Storage', urlSuffix: HOME_VILLAGE_SUFFIX },
+      { name: 'Elixir Storage', urlSuffix: HOME_VILLAGE_SUFFIX },
       { name: 'Dark Elixir Storage' },
       { name: 'Clan Castle' },
       {
@@ -110,7 +113,7 @@ export const builderBase: VillageBuildingScrapingCollection = {
       { name: 'Mine', urlSuffix: BUILDER_BASE_SUFFIX },
       { name: 'Mega Mine', urlSuffix: BUILDER_BASE_SUFFIX },
       {
-        name: 'Walls',
+        name: 'Wall',
         urlSuffix: BUILDER_BASE_SUFFIX,
         indexesToSkip: {
           headers: [4, 6],
@@ -147,10 +150,14 @@ export const builderBase: VillageBuildingScrapingCollection = {
           buildCost: 100000,
           buildTime: 0,
           friendlyBuildTime: 'N/A',
+          imageUrl:
+            'https://static.wikia.nocookie.net/clashofclans/images/9/95/O.T.T.O_Hut1.png',
           requiredHall: 9,
         },
         {
           level: 2,
+          imageUrl:
+            'http://static.wikia.nocookie.net/clashofclans/images/a/a7/O.T.T.O_Hut2.png',
           requirement: {
             homeVillage: {
               cannon: {
@@ -167,6 +174,8 @@ export const builderBase: VillageBuildingScrapingCollection = {
         },
         {
           level: 3,
+          imageUrl:
+            'https://static.wikia.nocookie.net/clashofclans/images/2/2e/O.T.T.O_Hut3.png',
           requirement: {
             builderBase: {
               cannonCart: {
@@ -177,6 +186,8 @@ export const builderBase: VillageBuildingScrapingCollection = {
         },
         {
           level: 4,
+          imageUrl:
+            'https://static.wikia.nocookie.net/clashofclans/images/6/6b/O.T.T.O_Hut4.png',
           requirement: {
             builderBase: {
               megaTesla: {
@@ -187,6 +198,8 @@ export const builderBase: VillageBuildingScrapingCollection = {
         },
         {
           level: 5,
+          imageUrl:
+            'https://static.wikia.nocookie.net/clashofclans/images/8/80/O.T.T.O_Hut5.png',
           requirement: {
             builderBase: {
               battleMachine: {

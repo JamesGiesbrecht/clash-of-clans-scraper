@@ -55,6 +55,36 @@ import { defaultPetsScrapingHeaders, pets } from './data/pets'
 
 const WIKI_BASE_URL = 'https://clashofclans.fandom.com/wiki/'
 
+const getFullResUrl = (url: string): string => {
+  const png = '.png'
+  const pngIndex = url.indexOf(png)
+  return url.substring(0, pngIndex + png.length)
+}
+
+const findImageUrl = (
+  $: cheerio.Root,
+  attr: string,
+  attrValue: string,
+): string => {
+  let src = ''
+  $('img').each((i, el) => {
+    const attributeValue = $(el).attr(attr)
+    if (attributeValue && attributeValue.startsWith(attrValue)) {
+      const characterAfterAttrValue = attributeValue.charAt(attrValue.length)
+      if (Number.isNaN(parseInt(characterAfterAttrValue, 10))) {
+        const imgSrc = $(el).attr('src')
+        const imgDataSrc = $(el).attr('data-src')
+        if (!imgSrc.startsWith('data:')) {
+          src = imgSrc
+        } else if (!imgDataSrc.startsWith('data:')) {
+          src = imgDataSrc
+        }
+      }
+    }
+  })
+  return src
+}
+
 const fetchPages = async (
   pageList: ScrapingTemplate[],
 ): Promise<{ info: ScrapingTemplate; page: cheerio.Root }[]> => {
@@ -75,17 +105,56 @@ const fetchPages = async (
 }
 
 const formatBuildingLevel = (
+  buildingName: string,
   rawLevel: { [key: string]: string },
   scrapingHeaders: ScrapingHeaders,
+  $: cheerio.Root,
 ): BuildingLevel => {
   const { seconds, timeString } = convertTimeStringToSeconds(
     rawLevel[scrapingHeaders.time],
   )
+
+  const buildingLevel = parseNumber(rawLevel[scrapingHeaders.level])
+  let imageUrl = findImageUrl(
+    $,
+    'alt',
+    buildingName.replace("'", '') + buildingLevel,
+  )
+
+  if (!imageUrl) {
+    imageUrl = findImageUrl(
+      $,
+      'alt',
+      buildingName.replace("'", '').replace(' ', '') + buildingLevel,
+    )
+  }
+
+  if (!imageUrl) {
+    imageUrl = findImageUrl(
+      $,
+      'alt',
+      buildingName.replace("'", '').replace(' ', '') + (buildingLevel - 1),
+    )
+  }
+
+  if (!imageUrl) {
+    let newBuildingLevel = ''
+    if (buildingLevel > 1) {
+      newBuildingLevel = (buildingLevel - 1).toString()
+    }
+    imageUrl = findImageUrl(
+      $,
+      'alt',
+      buildingName.replace("'", '') + newBuildingLevel,
+    )
+  }
+
   const level: BuildingLevel = {
-    level: parseNumber(rawLevel[scrapingHeaders.level]),
+    level: buildingLevel,
     buildCost: parseNumber(rawLevel[scrapingHeaders.cost] || rawLevel.Cost),
     buildTime: seconds,
     friendlyBuildTime: timeString,
+    imageUrl: getFullResUrl(imageUrl),
   }
 
   if (scrapingHeaders.requiredHall) {
@@ -194,7 +263,7 @@ const scrapeBuilding = (
     resource,
     type: buildingType,
     levels: statsTableAsJson.map((rawLevel: any) =>
-      formatBuildingLevel(rawLevel, scrapingHeaders),
+      formatBuildingLevel(buildingInfo.name, rawLevel, scrapingHeaders, $),
     ),
     availability: availabilityTableAsJson,
   }
