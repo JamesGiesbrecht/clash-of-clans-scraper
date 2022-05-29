@@ -35,13 +35,21 @@ export type HeroLevel = PetLevel & {
   requiredHall: number
 }
 
-export type TroopSpellSiegeMachineLevel = {
+type TroopSpellSiegeMachineBaseLevel = {
   level: number
   researchCost: number
   researchTime: number
   friendlyResearchTime: string
   requiredLab: number
 }
+
+export type TroopLevel = TroopSpellSiegeMachineBaseLevel & {
+  imageUrl: string
+}
+
+export type SpellLevel = TroopSpellSiegeMachineBaseLevel
+
+export type SiegeMachineLevel = TroopLevel
 
 export type Building = {
   name: string
@@ -61,21 +69,21 @@ export type Troop = {
   name: string
   resource: Resource
   requiredBarracks: number
-  levels: TroopSpellSiegeMachineLevel[]
+  levels: TroopLevel[]
 }
 
 export type Spell = {
   name: string
   resource: Resource
   requiredSpellFactory: number
-  levels: TroopSpellSiegeMachineLevel[]
+  levels: SpellLevel[]
 }
 
 export type SiegeMachine = {
   name: string
   resource: Resource
   requiredWorkshop: number
-  levels: TroopSpellSiegeMachineLevel[]
+  levels: SiegeMachineLevel[]
 }
 
 export type Pet = {
@@ -108,6 +116,7 @@ export type ScrapingHeaders = {
 
 export type ScrapingTemplate = {
   name: string
+  imageUrl?: string
   urlSuffix?: string
   indexesToSkip?: IndexesToSkip
   scraping?: ScrapingHeaders

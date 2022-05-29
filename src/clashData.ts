@@ -28,12 +28,14 @@ import {
   SpecialtyBuilding,
   VillageBuildingScrapingCollection,
   HeroLevel,
-  Troop as Spell,
-  TroopSpellSiegeMachineLevel,
+  Spell,
   SiegeMachine,
   Troop,
   Pet,
   PetLevel,
+  SpellLevel,
+  SiegeMachineLevel,
+  TroopLevel,
 } from './types'
 import {
   convertAvailabilityTableToJson,
@@ -181,14 +183,14 @@ const formatHeroLevel = (
   return level
 }
 
-const formatTroopSpellSiegeMachineLevel = (
+const formatSpellLevel = (
   rawLevel: { [key: string]: string },
   scrapingHeaders: ScrapingHeaders,
-): TroopSpellSiegeMachineLevel => {
+): SpellLevel => {
   const { seconds, timeString } = convertTimeStringToSeconds(
     rawLevel[scrapingHeaders.time],
   )
-  const level: TroopSpellSiegeMachineLevel = {
+  const level: SpellLevel = {
     level: parseNumber(rawLevel[scrapingHeaders.level]),
     researchCost: parseNumber(rawLevel[scrapingHeaders.cost] || rawLevel.Cost),
     researchTime: seconds,
@@ -197,6 +199,32 @@ const formatTroopSpellSiegeMachineLevel = (
   }
 
   return level
+}
+
+const formatTroopLevel = (
+  rawLevel: { [key: string]: string },
+  scrapingHeaders: ScrapingHeaders,
+): TroopLevel => {
+  const { seconds, timeString } = convertTimeStringToSeconds(
+    rawLevel[scrapingHeaders.time],
+  )
+  const level: TroopLevel = {
+    level: parseNumber(rawLevel[scrapingHeaders.level]),
+    researchCost: parseNumber(rawLevel[scrapingHeaders.cost] || rawLevel.Cost),
+    researchTime: seconds,
+    friendlyResearchTime: timeString,
+    requiredLab: parseNumber(rawLevel[scrapingHeaders.requiredHall]),
+    imageUrl: '',
+  }
+
+  return level
+}
+
+const formatSiegeMachineLevel = (
+  rawLevel: { [key: string]: string },
+  scrapingHeaders: ScrapingHeaders,
+): SiegeMachineLevel => {
+  return formatTroopLevel(rawLevel, scrapingHeaders)
 }
 
 const formatPetLevel = (
@@ -296,7 +324,7 @@ const scrapeTroop = (
   troopInfo: ScrapingTemplate,
   defaultScrapingHeaders: ScrapingHeaders,
   $: cheerio.Root,
-): Spell => {
+): Troop => {
   const { scrapingHeaders, resource, statsTableAsJson } = scrapePrep(
     defaultScrapingHeaders,
     troopInfo,
@@ -306,7 +334,7 @@ const scrapeTroop = (
   const troopInfoTable = getTableByTableText($, 'Barracks Level Required')
   const troopInfoTableAsJson = convertTableToJson($, troopInfoTable)[0]
 
-  const troop: Spell = {
+  const troop: Troop = {
     name: troopInfo.name,
     resource,
     requiredBarracks: parseNumber(
@@ -315,7 +343,7 @@ const scrapeTroop = (
         troopInfoTableAsJson['Dark Barracks Level Required'],
     ),
     levels: statsTableAsJson.map((rawLevel: any) => {
-      return formatTroopSpellSiegeMachineLevel(rawLevel, scrapingHeaders)
+      return formatTroopLevel(rawLevel, scrapingHeaders)
     }),
   }
 
@@ -339,12 +367,12 @@ const scrapeSpell = (
   const spell: Spell = {
     name: spellInfo.name,
     resource,
-    requiredBarracks: parseNumber(
+    requiredSpellFactory: parseNumber(
       spellInfoTableAsJson['Spell Factory Level Required'] ||
         spellInfoTableAsJson['Dark Spell Factory Level Required'],
     ),
     levels: statsTableAsJson.map((rawLevel: any) => {
-      return formatTroopSpellSiegeMachineLevel(rawLevel, scrapingHeaders)
+      return formatSpellLevel(rawLevel, scrapingHeaders)
     }),
   }
 
@@ -378,7 +406,7 @@ const scrapeSiegeMachine = (
       siegeMachineInfoTableAsJson['Workshop Level Required'],
     ),
     levels: statsTableAsJson.map((rawLevel: any) => {
-      return formatTroopSpellSiegeMachineLevel(rawLevel, scrapingHeaders)
+      return formatSiegeMachineLevel(rawLevel, scrapingHeaders)
     }),
   }
 
