@@ -1,49 +1,47 @@
 import {
-  getPage,
-  convertTableToJson,
-  convertTimeStringToSeconds,
-  writeJsonToFile,
-  convertToLowercaseRemoveSpaces,
-  camelize,
-  ucFirst,
-  getStatsTable,
-} from './utility'
-import { homeVillage } from './buildings'
-import { Building, BuildingType, Resource } from './types'
-
-const WIKI_BASE_URL = 'https://clashofclans.fandom.com/wiki/'
+  getBuilderBaseBuildings,
+  getBuilderBaseHeroes,
+  getBuilderBaseTroops,
+  getHomeVillageBuildings,
+  getHomeVillageHeroes,
+  getHomeVillageTroops,
+  getPets,
+  getSiegeMachines,
+  getSpells,
+} from './clashData'
+import { writeJsonToFile } from './utility'
 
 const run = async (): Promise<void> => {
-  const buildings: Building[] = []
-  for (const [category, buildingsList] of Object.entries(
-    homeVillage.buildings,
-  )) {
-    const pages = await Promise.all(
-      buildingsList.map(async (buildingName) => {
-        console.log('Fetching', buildingName)
-        return getPage(WIKI_BASE_URL + buildingName.replaceAll(' ', '_'))
-      }),
-    )
-    buildingsList.forEach((buildingName, index) => {
-      const $ = pages[index]
-      const table = getStatsTable($)
-      const tableAsJson = convertTableToJson($, table)
-      const resource: Resource = $('th', table)
-        .filter((i, el) => $(el).text().trim() === 'Build Cost')
-        .children('a')
-        .last()
-        .attr('title') as Resource
-      const buildingType: BuildingType = ucFirst(category) as BuildingType
-      const building: Building = {
-        name: buildingName,
-        resource,
-        type: buildingType,
-        levels: tableAsJson,
-      }
-      buildings.push(building)
-    })
-  }
-  writeJsonToFile(`buildings.json`, buildings)
+  const [
+    homeVillageBuildings,
+    builderBaseBuildings,
+    homeVillageHeroes,
+    builderBaseHeroes,
+    homeVillageTroops,
+    builderBaseTroops,
+    spells,
+    siegeMachines,
+    pets,
+  ] = await Promise.all([
+    getHomeVillageBuildings(),
+    getBuilderBaseBuildings(),
+    getHomeVillageHeroes(),
+    getBuilderBaseHeroes(),
+    getHomeVillageTroops(),
+    getBuilderBaseTroops(),
+    getSpells(),
+    getSiegeMachines(),
+    getPets(),
+  ])
+  writeJsonToFile('home-village-buildings.json', homeVillageBuildings)
+  writeJsonToFile('builder-base-buildings.json', builderBaseBuildings)
+  writeJsonToFile('home-village-heroes.json', homeVillageHeroes)
+  writeJsonToFile('builder-base-heroes.json', builderBaseHeroes)
+  writeJsonToFile('home-village-troops.json', homeVillageTroops)
+  writeJsonToFile('builder-base-troops.json', builderBaseTroops)
+  writeJsonToFile('spells.json', spells)
+  writeJsonToFile('siege-machines.json', siegeMachines)
+  writeJsonToFile('pets.json', pets)
 }
 
 run()

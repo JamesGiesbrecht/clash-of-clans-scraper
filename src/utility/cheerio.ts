@@ -1,5 +1,7 @@
 import axios from 'axios'
 import cheerio from 'cheerio'
+import { IndexesToSkip } from '../types'
+import { parseNumber } from './text'
 
 export const getPage = async (url: string) => {
   const result = await axios.get(url)
@@ -10,31 +12,80 @@ export const getStatsTable = ($: cheerio.Root): cheerio.Cheerio => {
   return $('table')
     .filter((i, el) => {
       const headerText = $(el).find('th').first().text().trim()
-      console.log(i, headerText, headerText === 'Level')
-      return headerText === 'Level'
-
-      // $('th', el).filter((i, el) => $(el).text().trim() === 'Level').length > 0
-      // $(el).text().trim() === 'Build Cost'
+      return (
+        headerText === 'Level' ||
+        headerText === 'TH Level' ||
+        headerText === 'BH Level'
+      )
     })
     .first()
 }
 
+export const getTableByTableText = (
+  $: cheerio.Root,
+  identifier: string | string[],
+) => {
+  return $('table')
+    .filter((i, el) => {
+      const tableText = $(el).text()
+      if (Array.isArray(identifier)) {
+        return identifier.some((id) => tableText.includes(id))
+      }
+      return tableText.includes(identifier)
+    })
+    .first()
+}
+
+export const getAvailabilityTable = ($: cheerio.Root): cheerio.Cheerio => {
+  return $('table')
+    .filter((i, el) => {
+      const firstHeaderText = $(el).find('th').first().text().trim()
+      const lastHeaderText = $(el).find('th').last().text().trim()
+      return (
+        (firstHeaderText === 'Town Hall Level' ||
+          firstHeaderText === 'Builder Hall Level') &&
+        lastHeaderText === 'Number Available'
+      )
+    })
+    .first()
+}
+
+// export const getTroopInfoTable = ($: cheerio.Root): cheerio.Cheerio => {
+//   let troopInfoTableIndex
+//   $('table').each((i, el) => {
+//     const tableText = $(el).text()
+//     if (tableText.includes('Barracks Level Required')) {
+//       troopInfoTableIndex = i
+//     }
+//   })
+//   if (!troopInfoTableIndex) throw new Error('Could not find troop info table')
+//   return $('table').eq(troopInfoTableIndex).first()
+// }
+
 export const convertTableToJson = (
   $: cheerio.Root,
   table: cheerio.Cheerio,
+  indexesToSkip?: IndexesToSkip,
 ): any => {
   const tableAsJson: any[] = []
   // Get column headings
   // @fixme Doesn't support vertical column headings.
   // @todo Try to support badly formated tables.
   const columnHeadings: any[] = []
+
   $(table)
     .find('tr')
+    .first()
     .each((i, row) => {
       $(row)
         .find('th')
         .each((j, cell) => {
-          columnHeadings[j] = $(cell).text().trim()
+          if (indexesToSkip) {
+            if (indexesToSkip.headers?.includes(j)) {
+              return
+            }
+          }
+          columnHeadings.push($(cell).text().trim())
         })
     })
 
@@ -43,19 +94,60 @@ export const convertTableToJson = (
     .find('tr')
     .each((i, row) => {
       const rowAsJson: any = {}
+      const rowValues: any[] = []
       $(row)
         .find('td')
         .each((j, cell) => {
-          if (columnHeadings[j]) {
-            rowAsJson[columnHeadings[j]] = $(cell).text().trim()
-          } else {
-            rowAsJson[j] = $(cell).text().trim()
+          if (indexesToSkip) {
+            if (indexesToSkip.rows?.includes(j)) {
+              return
+            }
           }
+          rowValues.push($(cell).text().trim())
+          columnHeadings.forEach((heading, index) => {
+            rowAsJson[heading] = rowValues[index]
+          })
         })
 
       // Skip blank rows
       if (JSON.stringify(rowAsJson) !== '{}') tableAsJson.push(rowAsJson)
     })
+
+  return tableAsJson
+}
+
+export const convertAvailabilityTableToJson = (
+  $: cheerio.Root,
+  table: cheerio.Cheerio,
+): any => {
+  const tableAsJson: any = {}
+  const columnHeadings: any[] = []
+  const rowValues: any[] = []
+
+  $(table)
+    .find('tr')
+    .first()
+    .each((i, row) => {
+      $(row)
+        .find('th')
+        .each((j, cell) => {
+          columnHeadings.push($(cell).text().trim())
+        })
+    })
+  // Remove Header Text
+  columnHeadings.shift()
+
+  $(table)
+    .find('tr')
+    .last()
+    .find('td')
+    .each((i, cell) => {
+      rowValues.push($(cell).text().trim())
+    })
+
+  columnHeadings.forEach((heading, index) => {
+    tableAsJson[heading] = parseNumber(rowValues[index])
+  })
 
   return tableAsJson
 }
