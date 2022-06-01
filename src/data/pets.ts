@@ -7,8 +7,24 @@ export const defaultPetsScrapingHeaders: ScrapingHeaders = {
 }
 
 export const pets: ScrapingTemplate[] = [
-  { name: 'L.A.S.S.I' },
-  { name: 'Electro Owl' },
-  { name: 'Mighty Yak' },
-  { name: 'Unicorn' },
+  {
+    name: 'L.A.S.S.I',
+    imageUrl:
+      'https://static.wikia.nocookie.net/clashofclans/images/5/5a/LASSI_field.png',
+  },
+  {
+    name: 'Electro Owl',
+    imageUrl:
+      'https://static.wikia.nocookie.net/clashofclans/images/8/88/Electro_Owl_field.png',
+  },
+  {
+    name: 'Mighty Yak',
+    imageUrl:
+      'https://static.wikia.nocookie.net/clashofclans/images/6/66/Mighty_Yak_field.png',
+  },
+  {
+    name: 'Unicorn',
+    imageUrl:
+      'https://static.wikia.nocookie.net/clashofclans/images/6/67/Unicorn_field.png',
+  },
 ]
