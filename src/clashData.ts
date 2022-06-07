@@ -57,7 +57,7 @@ import { defaultPetsScrapingHeaders, pets } from './data/pets'
 
 const WIKI_BASE_URL = 'https://clashofclans.fandom.com/wiki/'
 
-const getFullResUrl = (url: string): string => {
+const stripParamsFromImageUrl = (url: string): string => {
   const png = '.png'
   const pngIndex = url.indexOf(png)
   return url.substring(0, pngIndex + png.length)
@@ -68,7 +68,7 @@ const findImageUrl = (
   attr: string,
   attrValue: string,
 ): string => {
-  let src = ''
+  const matchSrc: string[] = []
   $('img').each((i, el) => {
     const attributeValue = $(el).attr(attr)
     if (attributeValue && attributeValue.startsWith(attrValue)) {
@@ -77,14 +77,14 @@ const findImageUrl = (
         const imgSrc = $(el).attr('src')
         const imgDataSrc = $(el).attr('data-src')
         if (!imgSrc.startsWith('data:')) {
-          src = imgSrc
+          matchSrc.push(imgSrc)
         } else if (!imgDataSrc.startsWith('data:')) {
-          src = imgDataSrc
+          matchSrc.push(imgDataSrc)
         }
       }
     }
   })
-  return src
+  return matchSrc[0] || ''
 }
 
 const fetchPages = async (
@@ -117,34 +117,32 @@ const formatBuildingLevel = (
   )
 
   const buildingLevel = parseNumber(rawLevel[scrapingHeaders.level])
-  let imageUrl = findImageUrl(
-    $,
-    'alt',
-    buildingName.replace("'", '') + buildingLevel,
+  let remoteImageUrl = stripParamsFromImageUrl(
+    findImageUrl($, 'alt', buildingName.replace("'", '') + buildingLevel),
   )
 
-  if (!imageUrl) {
-    imageUrl = findImageUrl(
+  if (!remoteImageUrl) {
+    remoteImageUrl = findImageUrl(
       $,
       'alt',
       buildingName.replace("'", '').replace(' ', '') + buildingLevel,
     )
   }
 
-  if (!imageUrl) {
-    imageUrl = findImageUrl(
+  if (!remoteImageUrl) {
+    remoteImageUrl = findImageUrl(
       $,
       'alt',
       buildingName.replace("'", '').replace(' ', '') + (buildingLevel - 1),
     )
   }
 
-  if (!imageUrl) {
+  if (!remoteImageUrl) {
     let newBuildingLevel = ''
     if (buildingLevel > 1) {
       newBuildingLevel = (buildingLevel - 1).toString()
     }
-    imageUrl = findImageUrl(
+    remoteImageUrl = findImageUrl(
       $,
       'alt',
       buildingName.replace("'", '') + newBuildingLevel,
@@ -156,7 +154,9 @@ const formatBuildingLevel = (
     buildCost: parseNumber(rawLevel[scrapingHeaders.cost] || rawLevel.Cost),
     buildTime: seconds,
     friendlyBuildTime: timeString,
-    remoteImageUrl: getFullResUrl(imageUrl),
+    remoteImageUrl,
+    // TODO
+    imageUrl: '',
   }
 
   if (scrapingHeaders.requiredHall) {
@@ -214,7 +214,9 @@ const formatTroopLevel = (
     researchTime: seconds,
     friendlyResearchTime: timeString,
     requiredLab: parseNumber(rawLevel[scrapingHeaders.requiredHall]),
+    // TODO
     remoteImageUrl: '',
+    imageUrl: '',
   }
 
   return level
@@ -310,13 +312,15 @@ const scrapeHero = (
     $,
   )
 
-  if (!heroInfo.imageUrl) {
+  if (!heroInfo.remoteImageUrl) {
     throw new Error(`No url provided for ${heroInfo.name}`)
   }
 
   const hero: Hero = {
     name: heroInfo.name,
-    remoteImageUrl: heroInfo.imageUrl,
+    remoteImageUrl: heroInfo.remoteImageUrl,
+    // TODO
+    imageUrl: '',
     resource,
     levels: statsTableAsJson.map((rawLevel: any) =>
       formatHeroLevel(rawLevel, scrapingHeaders),
@@ -369,13 +373,15 @@ const scrapeSpell = (
   const spellInfoTable = getTableByTableText($, 'Spell Factory Level Required')
   const spellInfoTableAsJson = convertTableToJson($, spellInfoTable)[0]
 
-  if (!spellInfo.imageUrl) {
+  if (!spellInfo.remoteImageUrl) {
     throw new Error(`No url provided for ${spellInfo.name}`)
   }
 
   const spell: Spell = {
     name: spellInfo.name,
-    remoteImageUrl: spellInfo.imageUrl,
+    remoteImageUrl: spellInfo.remoteImageUrl,
+    // TODO
+    imageUrl: '',
     resource,
     requiredSpellFactory: parseNumber(
       spellInfoTableAsJson['Spell Factory Level Required'] ||
@@ -438,13 +444,15 @@ const scrapePets = (
   const petInfoTableAsJson = convertTableToJson($, petInfoTable)[0]
   console.log(`Formatting ${petInfo.name}`)
 
-  if (!petInfo.imageUrl) {
+  if (!petInfo.remoteImageUrl) {
     throw new Error(`No url provided for ${petInfo.name}`)
   }
 
   const pet: Pet = {
     name: petInfo.name,
-    remoteImageUrl: petInfo.imageUrl,
+    remoteImageUrl: petInfo.remoteImageUrl,
+    // TODO
+    imageUrl: '',
     resource,
     requiredPetHouse: parseNumber(
       petInfoTableAsJson['Pet House Level Required'],
