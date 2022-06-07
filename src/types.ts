@@ -20,7 +20,7 @@ export type BuildingLevel = {
   buildCost: number
   buildTime: number
   friendlyBuildTime: string
-  imageUrl: string
+  remoteImageUrl: string
   requiredHall?: number
 }
 
@@ -44,7 +44,7 @@ type TroopSpellSiegeMachineBaseLevel = {
 }
 
 export type TroopLevel = TroopSpellSiegeMachineBaseLevel & {
-  imageUrl: string
+  remoteImageUrl: string
 }
 
 export type SpellLevel = TroopSpellSiegeMachineBaseLevel
@@ -61,6 +61,7 @@ export type Building = {
 
 export type Hero = {
   name: string
+  remoteImageUrl: string
   resource: Resource
   levels: HeroLevel[]
 }
@@ -74,6 +75,7 @@ export type Troop = {
 
 export type Spell = {
   name: string
+  remoteImageUrl: string
   resource: Resource
   requiredSpellFactory: number
   levels: SpellLevel[]
@@ -88,6 +90,7 @@ export type SiegeMachine = {
 
 export type Pet = {
   name: string
+  remoteImageUrl: string
   resource: Resource
   requiredPetHouse: number
   levels: PetLevel[]
@@ -97,7 +100,8 @@ export type SpecialtyBuilding = Overwrite<
   Building,
   {
     levels: Array<
-      BuildingLevel | { level: number; imageUrl: string; requirement: any }
+      | BuildingLevel
+      | { level: number; remoteImageUrl: string; requirement: any }
     >
   }
 >

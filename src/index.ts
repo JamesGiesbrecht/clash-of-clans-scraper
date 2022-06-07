@@ -11,6 +11,9 @@ import {
 } from './clashData'
 import { writeJsonToFile } from './utility'
 
+// TODO: Get Image URLs
+// TODO: Clan Capital
+
 const run = async (): Promise<void> => {
   const [
     homeVillageBuildings,

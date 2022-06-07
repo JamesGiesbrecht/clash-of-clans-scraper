@@ -156,7 +156,7 @@ const formatBuildingLevel = (
     buildCost: parseNumber(rawLevel[scrapingHeaders.cost] || rawLevel.Cost),
     buildTime: seconds,
     friendlyBuildTime: timeString,
-    imageUrl: getFullResUrl(imageUrl),
+    remoteImageUrl: getFullResUrl(imageUrl),
   }
 
   if (scrapingHeaders.requiredHall) {
@@ -214,7 +214,7 @@ const formatTroopLevel = (
     researchTime: seconds,
     friendlyResearchTime: timeString,
     requiredLab: parseNumber(rawLevel[scrapingHeaders.requiredHall]),
-    imageUrl: '',
+    remoteImageUrl: '',
   }
 
   return level
@@ -310,8 +310,13 @@ const scrapeHero = (
     $,
   )
 
+  if (!heroInfo.imageUrl) {
+    throw new Error(`No url provided for ${heroInfo.name}`)
+  }
+
   const hero: Hero = {
     name: heroInfo.name,
+    remoteImageUrl: heroInfo.imageUrl,
     resource,
     levels: statsTableAsJson.map((rawLevel: any) =>
       formatHeroLevel(rawLevel, scrapingHeaders),
@@ -364,8 +369,13 @@ const scrapeSpell = (
   const spellInfoTable = getTableByTableText($, 'Spell Factory Level Required')
   const spellInfoTableAsJson = convertTableToJson($, spellInfoTable)[0]
 
+  if (!spellInfo.imageUrl) {
+    throw new Error(`No url provided for ${spellInfo.name}`)
+  }
+
   const spell: Spell = {
     name: spellInfo.name,
+    remoteImageUrl: spellInfo.imageUrl,
     resource,
     requiredSpellFactory: parseNumber(
       spellInfoTableAsJson['Spell Factory Level Required'] ||
@@ -428,8 +438,13 @@ const scrapePets = (
   const petInfoTableAsJson = convertTableToJson($, petInfoTable)[0]
   console.log(`Formatting ${petInfo.name}`)
 
+  if (!petInfo.imageUrl) {
+    throw new Error(`No url provided for ${petInfo.name}`)
+  }
+
   const pet: Pet = {
     name: petInfo.name,
+    remoteImageUrl: petInfo.imageUrl,
     resource,
     requiredPetHouse: parseNumber(
       petInfoTableAsJson['Pet House Level Required'],

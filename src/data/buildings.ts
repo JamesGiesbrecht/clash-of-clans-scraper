@@ -143,7 +143,7 @@ export const builderBase: VillageBuildingScrapingCollection = {
       levels: [
         {
           level: 1,
-          imageUrl:
+          remoteImageUrl:
             'https://static.wikia.nocookie.net/clashofclans/images/e/e4/Army_CampB.png',
           requirement: {
             '1': {
@@ -201,13 +201,13 @@ export const builderBase: VillageBuildingScrapingCollection = {
           buildCost: 100000,
           buildTime: 0,
           friendlyBuildTime: 'N/A',
-          imageUrl:
+          remoteImageUrl:
             'https://static.wikia.nocookie.net/clashofclans/images/9/95/O.T.T.O_Hut1.png',
           requiredHall: 9,
         },
         {
           level: 2,
-          imageUrl:
+          remoteImageUrl:
             'http://static.wikia.nocookie.net/clashofclans/images/a/a7/O.T.T.O_Hut2.png',
           requirement: {
             homeVillage: {
@@ -225,7 +225,7 @@ export const builderBase: VillageBuildingScrapingCollection = {
         },
         {
           level: 3,
-          imageUrl:
+          remoteImageUrl:
             'https://static.wikia.nocookie.net/clashofclans/images/2/2e/O.T.T.O_Hut3.png',
           requirement: {
             builderBase: {
@@ -237,7 +237,7 @@ export const builderBase: VillageBuildingScrapingCollection = {
         },
         {
           level: 4,
-          imageUrl:
+          remoteImageUrl:
             'https://static.wikia.nocookie.net/clashofclans/images/6/6b/O.T.T.O_Hut4.png',
           requirement: {
             builderBase: {
@@ -249,7 +249,7 @@ export const builderBase: VillageBuildingScrapingCollection = {
         },
         {
           level: 5,
-          imageUrl:
+          remoteImageUrl:
             'https://static.wikia.nocookie.net/clashofclans/images/8/80/O.T.T.O_Hut5.png',
           requirement: {
             builderBase: {
