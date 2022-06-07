@@ -38,9 +38,11 @@ import {
   TroopLevel,
 } from './types'
 import {
+  camelize,
   convertAvailabilityTableToJson,
   convertTableToJson,
   convertTimeStringToSeconds,
+  downloadImage,
   getAvailabilityTable,
   getPage,
   getStatsTable,
@@ -56,6 +58,8 @@ import {
 import { defaultPetsScrapingHeaders, pets } from './data/pets'
 
 const WIKI_BASE_URL = 'https://clashofclans.fandom.com/wiki/'
+
+const getLocalImagePath = (name: string) => `./img/${camelize(name)}.png`
 
 const stripParamsFromImageUrl = (url: string): string => {
   const png = '.png'
@@ -149,14 +153,17 @@ const formatBuildingLevel = (
     )
   }
 
+  // TODO Download per level and differentiate by village
+  const localImagePath = getLocalImagePath(buildingName)
+  downloadImage(remoteImageUrl, localImagePath)
+
   const level: BuildingLevel = {
     level: buildingLevel,
     buildCost: parseNumber(rawLevel[scrapingHeaders.cost] || rawLevel.Cost),
     buildTime: seconds,
     friendlyBuildTime: timeString,
     remoteImageUrl,
-    // TODO
-    imageUrl: '',
+    imageUrl: localImagePath,
   }
 
   if (scrapingHeaders.requiredHall) {
@@ -316,11 +323,13 @@ const scrapeHero = (
     throw new Error(`No url provided for ${heroInfo.name}`)
   }
 
+  const localImagePath = getLocalImagePath(heroInfo.name)
+  downloadImage(heroInfo.remoteImageUrl, localImagePath)
+
   const hero: Hero = {
     name: heroInfo.name,
     remoteImageUrl: heroInfo.remoteImageUrl,
-    // TODO
-    imageUrl: '',
+    imageUrl: localImagePath,
     resource,
     levels: statsTableAsJson.map((rawLevel: any) =>
       formatHeroLevel(rawLevel, scrapingHeaders),
@@ -377,11 +386,13 @@ const scrapeSpell = (
     throw new Error(`No url provided for ${spellInfo.name}`)
   }
 
+  const localImagePath = getLocalImagePath(spellInfo.name)
+  downloadImage(spellInfo.remoteImageUrl, localImagePath)
+
   const spell: Spell = {
     name: spellInfo.name,
     remoteImageUrl: spellInfo.remoteImageUrl,
-    // TODO
-    imageUrl: '',
+    imageUrl: localImagePath,
     resource,
     requiredSpellFactory: parseNumber(
       spellInfoTableAsJson['Spell Factory Level Required'] ||
@@ -448,11 +459,13 @@ const scrapePets = (
     throw new Error(`No url provided for ${petInfo.name}`)
   }
 
+  const localImagePath = getLocalImagePath(petInfo.name)
+  downloadImage(petInfo.remoteImageUrl, localImagePath)
+
   const pet: Pet = {
     name: petInfo.name,
     remoteImageUrl: petInfo.remoteImageUrl,
-    // TODO
-    imageUrl: '',
+    imageUrl: localImagePath,
     resource,
     requiredPetHouse: parseNumber(
       petInfoTableAsJson['Pet House Level Required'],
